@@ -7,9 +7,15 @@ assignees: qanazoga
 
 ---
 
-Command Name:
+### Command Name:
 [command-name | command-alias-1, command-alias-2, etc]
 
-Command Description:
+### Command Description:
 - [Give a short description of command that would work as helptext]
-- [Give a longer description of your command, used for extended helptext, also a description of how to use the command]
+- [Give a longer description of your command, used for extended helptext, also a description of how to use the command, include a code block if you need to]
+
+### Permissions:
+- [None | a good description if not None]
+
+### Other Requirements:
+- [None | a good description if not None. Needs some module enabled, etc.]
