@@ -14,8 +14,8 @@ assignees: qanazoga
 - [Give a short description of command that would work as helptext]
 - [Give a longer description of your command, used for extended helptext, also a description of how to use the command, include a code block if you need to]
 
-### Permissions:
+### User Permissions:
 - [None | a good description if not None]
 
-### Other Requirements:
+### Bot Permissions
 - [None | a good description if not None. Needs some module enabled, etc.]
