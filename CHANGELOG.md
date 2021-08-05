@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.1] - 2021-08-01
+## [0.1.0] - 2021-08-01
 ### Added
 - Created default lein app, updated all files.
 
