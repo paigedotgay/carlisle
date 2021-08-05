@@ -14,10 +14,7 @@ before_script:
 test:
   stage: test
   script:
-    - mkdir .public
-    - cp -r ./doc .public
-    - mv .public public
-    - gitbook build . public # build to public path
+    - gitbook build doc public # build to public path
   only:
     - branches # this job will affect every branch except 'main'
   except:
@@ -27,7 +24,7 @@ test:
 pages:
   stage: deploy
   script:
-    - gitbook build . public # build to public path
+    - gitbook build doc public # build to public path
   artifacts:
     paths:
       - public
