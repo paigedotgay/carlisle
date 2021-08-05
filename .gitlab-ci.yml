@@ -9,13 +9,14 @@ cache:
 before_script:
   - npm install gitbook-cli -g # install gitbook
   - gitbook fetch 3.2.3 # fetch final stable version
-  - cd ./doc
   - gitbook install # add any requested plugins in book.json
 
 test:
   stage: test
   script:
-    - ls
+    - mkdir .public
+    - cp -r ./doc .public
+    - mv .public public
     - gitbook build . public # build to public path
   only:
     - branches # this job will affect every branch except 'main'
@@ -26,7 +27,6 @@ test:
 pages:
   stage: deploy
   script:
-    - ls
     - gitbook build . public # build to public path
   artifacts:
     paths:
