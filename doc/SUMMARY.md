@@ -1,17 +1,17 @@
 # Summary
 
-* [Home](/)
+* [Home](https://qanazoga.com)
 * [About](README.md)
 
 * Commands
-  * [Placeholder](#)
-  * [Placeholder](#)
-  * [Placeholder](#)
+  * [Placeholder](qanazoga.com)
+  * [Placeholder](qanazoga.com)
+  * [Placeholder](qanazoga.com)
   
 * Modules
-  * [Placeholder](#)
-  * [Placeholder](#)
-  * [Placeholder](#)
+  * [Placeholder](qanazoga.com)
+  * [Placeholder](qanazoga.com)
+  * [Placeholder](qanazoga.com)
   
 * Additional info
   * [References](references.md)
