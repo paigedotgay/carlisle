@@ -1,7 +1,11 @@
 # Introduction to Carlisle
 
 ## About
-My 3rd Discord bot, written in Clojure + Kotlin!
+My 3rd Discord bot, written in Clojure + Kotlin!  
+- To invite Carlisle, click [here](https://discord.com/api/oauth2/authorize?client_id=829523205592055848&permissions=8&scope=bot).  
+- For the official support server, click [here](http://discord.carlisle.qanazoga.com)
+- Repos: [GitLab](https://gitlab.com/qanazoga/carlisle) (main) and [GitHub](https://github.com/qanazoga/carlisle-bot) (mirror)
+
 These docs are made using GitBook (because I understand it), but might be automated in the future...
 
 ## Planned Features
