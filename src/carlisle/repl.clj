@@ -21,7 +21,10 @@
 (declare ^:dynamic guild)
 (declare ^:dynamic *last*)
 
-(defn strip-codeblock [msg]
+(defn strip-codeblock 
+  "Writing code in blocks for syntax highlighting is nice, but breaks the evaluator.
+  This strips the blocks (and the language identifier) from the text."
+  [msg]
   (if (and
        (starts-with? msg "```")
        (ends-with? msg "```"))
@@ -57,7 +60,7 @@
                      (str result))]
       (.. channel (sendMessage response) queue)
       result))
-       (def *last*)))
+       (def ^:dynamic *last*)))
 
 
 (defn safe-to-eval? [event]
