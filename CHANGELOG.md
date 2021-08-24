@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2021-08-01
 ### Added
 - Created default lein app, updated all files.
+- Bot logs in
+- Bot can evaluate arbitrary code
 
 ### Changed
 - Moved project to GitLab, updated all links etc.
