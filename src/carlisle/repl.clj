@@ -1,9 +1,11 @@
 (ns carlisle.repl
   (:gen-class)
   (:use [clojure.java.javadoc]
-        [clojure.repl]
-        [clojure.string :only [starts-with? ends-with? join]])
-  (:import [net.dv8tion.jda.api.events.message MessageReceivedEvent]
+        [clojure.repl])
+  (:require [clojure.string :as str]
+            [clojure.data.json :as json])
+  (:import [java.io ByteArrayOutputStream PrintStream PrintWriter OutputStreamWriter]
+           [net.dv8tion.jda.api.events.message MessageReceivedEvent]
            [net.dv8tion.jda.api.entities ChannelType]))
 
 ;; Mostly here for repl sessions and debugging
@@ -26,10 +28,27 @@
   This strips the blocks (and the language identifier) from the text."
   [msg]
   (if (and
-       (starts-with? msg "```")
-       (ends-with? msg "```"))
-    (clojure.string/replace msg #"(^.*?\s)|(\n.*$)" "" )
+       (str/starts-with? msg "```")
+       (str/ends-with? msg "```"))
+    (str/replace msg #"(^.*?\s)|(\n.*$)" "" )
     msg))
+
+(defn safe-to-eval? [event]
+  (and 
+   (-> (.. event getMessage getContentDisplay)
+       (str/replace "\n" " ")
+       (str/split #"\s")
+       (first)
+       (= "!e"))
+   (= 
+    (.. event getAuthor getId)
+    "135347294093443072"))) ;this shouldn't be hard-coded, I'll fix it soon :p
+
+(defn reply 
+  "shortcut to reply in current channel
+  don't use outside of an eval command" 
+  [msg]
+  (.queue (.. channel (sendMessage msg))))
 
 (defn eval-command 
   "Evaluate arbitrary code.
@@ -44,36 +63,34 @@
   *last*  - The result of the last evaluation"
   [_event] 
   (->> (binding [*ns* (find-ns 'carlisle.repl)
-            event _event
-            bot (.. _event getJDA)
-            author (.. _event getAuthor)
-            channel (.. _event getChannel)
-            msg (.. _event getMessage)
-            txt (join " " (rest (.. _event getMessage getContentDisplay (split " "))))
-            guild (if (.. _event (isFromType ChannelType/TEXT))
-                    (.. _event getGuild)
-                    nil)]
-    
-    (let [result (eval (read-string (strip-codeblock txt)))
-          response (if (empty? (str result))
-                     "nil"
-                     (str result))]
-      (.. channel (sendMessage response) queue)
-      result))
+                 event _event
+                 bot (.. _event getJDA)
+                 author (.. _event getAuthor)
+                 channel (.. _event getChannel)
+                 msg (.. _event getMessage)
+                 txt (->> (.. _event getMessage getContentDisplay (str/split " "))
+                          (filter #(not (str/blank? %)))
+                          (rest)
+                          (str/join " "))
+                 guild (if (.. _event (isFromType ChannelType/TEXT))
+                         (.. _event getGuild)
+                         nil)]
+         
+         (let [result (try
+                        (eval (read-string (strip-codeblock txt)))
+                        (catch Exception e (format "%nException: %s%nCause: %s"
+                                                   (.getMessage e)
+                                                   (.getCause e))))
+               
+               response (->> [(str result) "nil"]
+                             (filter #(not (str/blank? %)))
+                             (first)
+                             (format "```clj%n%s```"))]
+           
+           (reply response)
+           result))
        (def ^:dynamic *last*)))
 
 
-(defn safe-to-eval? [event]
-  (and 
-   (starts-with? (.. event getMessage getContentDisplay)
-                 "!e ")
-   (= 
-    (.. event getAuthor getId)
-    "135347294093443072"))) ;this shouldn't be hard-coded, I'll fix it soon :p
 
-(defn reply 
-  "shortcut to reply in current channel
-  don't use outside of an eval command" 
-  [msg]
-  (.. channel (sendMessage msg) queue))
 
