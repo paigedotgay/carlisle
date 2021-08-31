@@ -1,9 +1,12 @@
 (ns carlisle.repl
   (:gen-class)
-  (:use [clojure.java.javadoc]
+  (:use [carlisle.config :only [config]] 
+        [carlisle.util]
+        [clojure.java.javadoc]
         [clojure.repl])
   (:require [clojure.string :as str]
-            [clojure.data.json :as json])
+            [clojure.data.json :as json]
+            [clojure.data.xml :as xml])
   (:import [java.io ByteArrayOutputStream PrintStream PrintWriter OutputStreamWriter]
            [net.dv8tion.jda.api.events.message MessageReceivedEvent]
            [net.dv8tion.jda.api.entities ChannelType]))
@@ -22,6 +25,22 @@
 (declare ^:dynamic txt)
 (declare ^:dynamic guild)
 (declare ^:dynamic *last*)
+
+
+(def wolf-id "&appid=")
+(def wolf-url "https://api.wolframalpha.com/v2/query?input=")
+
+(defn reply 
+  "shortcut to reply in current channel
+  don't use outside of an eval command" 
+  [msg]
+  (let [fmt (if (<= 2000 (count msg))
+              (if (or (str/starts-with? "```" msg) (str/starts-with? "```clj" msg))
+                (trunc msg 2000)
+                (str (trunc msg 1994) "...```"))
+              msg)]
+    (.queue (.. channel (sendMessage fmt)))
+    fmt))
 
 (defn strip-codeblock 
   "Writing code in blocks for syntax highlighting is nice, but breaks the evaluator.
@@ -42,14 +61,42 @@
        (= "!e"))
    (= 
     (.. event getAuthor getId)
-    "135347294093443072"))) ;this shouldn't be hard-coded, I'll fix it soon :p
+    (config :owner))))
 
-(defn reply 
-  "shortcut to reply in current channel
-  don't use outside of an eval command" 
-  [msg]
-  (.queue (.. channel (sendMessage msg))))
+(defn bruh [q]
+  (-> (str wolf-url (str/replace q " " "%20") wolf-id)
+      (slurp)
+      (xml/parse-str)
+      :content
+      rest first
+      :content
+      first
+      :content
+      last
+      :content
+      first
+      reply))
 
+(defn- eval-to-map [txt]
+  (with-out-result-map 
+    (try (eval (read-string (strip-codeblock txt)))
+         (catch Exception e (format "%nException: %s%nCause: %s"
+                                    (.getMessage e)
+                                    (.getCause e))))))
+
+(defn- format-response [out-result-map]
+  (reply (str out-result-map))
+  (let [result (out-result-map :result)
+        out (out-result-map :out)]
+    (str/join "\n"
+              [(->> [(str result) "nil"]
+                    (filter #(not (str/blank? %)))
+                    (first)
+                    (format "Return: ```clj%n%s```"))
+               (if (str/blank? out)
+                 ""
+                 (format "Out: ```clj%n%s```" out))])))
+  
 (defn eval-command 
   "Evaluate arbitrary code.
   The following variables have been assigned for your convenience:
@@ -75,22 +122,16 @@
                  guild (if (.. _event (isFromType ChannelType/TEXT))
                          (.. _event getGuild)
                          nil)]
-         
-         (let [result (try
-                        (eval (read-string (strip-codeblock txt)))
-                        (catch Exception e (format "%nException: %s%nCause: %s"
-                                                   (.getMessage e)
-                                                   (.getCause e))))
-               
-               response (->> [(str result) "nil"]
-                             (filter #(not (str/blank? %)))
-                             (first)
-                             (format "```clj%n%s```"))]
+         (let [result-map (eval-to-map txt)
+               result (result-map :result)
+               out (result-map :out)
+               response (format-response result-map)]
            
            (reply response)
            result))
        (def ^:dynamic *last*)))
 
-
-
-
+(-> (slurp "https://api.warframestat.us/pc/voidTrader")
+    (json/read-str :key-fn keyword)
+    (str/replace "," "\n"))
+                   
