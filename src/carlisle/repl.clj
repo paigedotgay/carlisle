@@ -26,10 +26,6 @@
 (declare ^:dynamic guild)
 (declare ^:dynamic *last*)
 
-
-(def wolf-id "&appid=")
-(def wolf-url "https://api.wolframalpha.com/v2/query?input=")
-
 (defn reply 
   "shortcut to reply in current channel
   don't use outside of an eval command" 
@@ -42,29 +38,10 @@
     (.queue (.. channel (sendMessage fmt)))
     fmt))
 
-(defn strip-codeblock 
-  "Writing code in blocks for syntax highlighting is nice, but breaks the evaluator.
-  This strips the blocks (and the language identifier) from the text."
-  [msg]
-  (if (and
-       (str/starts-with? msg "```")
-       (str/ends-with? msg "```"))
-    (str/replace msg #"(^.*?\s)|(\n.*$)" "" )
-    msg))
-
-(defn safe-to-eval? [event]
-  (and 
-   (-> (.. event getMessage getContentDisplay)
-       (str/replace "\n" " ")
-       (str/split #"\s")
-       (first)
-       (= "!e"))
-   (= 
-    (.. event getAuthor getId)
-    (config :owner))))
-
 (defn bruh [q]
-  (-> (str wolf-url (str/replace q " " "%20") wolf-id)
+  (-> (format "https://api.wolframalpha.com/v2/query?input=%s&appid=%s" 
+              (str/replace q " " "%20")
+              (config :wolfram-token))
       (slurp)
       (xml/parse-str)
       :content
@@ -77,6 +54,29 @@
       first
       reply))
 
+(defn strip-codeblock 
+  "Writing code in blocks for syntax highlighting is nice, but breaks the evaluator.
+  This strips the blocks (and the language identifier) from the text."
+  [msg]
+  (if (and
+       (str/starts-with? msg "```")
+       (str/ends-with? msg "```"))
+    (str/replace msg #"(^.*?\s)|(\n.*$)" "" )
+    msg))
+
+(defn safe-to-eval? 
+  "Ensures that an eval is intended, and it is sent my owner"
+  [event]
+  (and 
+   (-> (.. event getMessage getContentDisplay)
+       (str/replace "\n" " ")
+       (str/split #"\s")
+       (first)
+       (= "!e"))
+   (= 
+    (.. event getAuthor getId)
+    (config :owner))))
+
 (defn- eval-to-map [txt]
   (with-out-result-map 
     (try (eval (read-string (strip-codeblock txt)))
@@ -85,7 +85,6 @@
                                     (.getCause e))))))
 
 (defn- format-response [out-result-map]
-  (reply (str out-result-map))
   (let [result (out-result-map :result)
         out (out-result-map :out)]
     (str/join "\n"
@@ -134,4 +133,4 @@
 (-> (slurp "https://api.warframestat.us/pc/voidTrader")
     (json/read-str :key-fn keyword)
     (str/replace "," "\n"))
-                   
+      

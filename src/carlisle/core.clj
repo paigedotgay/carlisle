@@ -1,3 +1,4 @@
+
 (ns carlisle.core
   (:gen-class)
   (:use [carlisle.config :only [config]] 
@@ -13,23 +14,19 @@
 (defn -main
   [& args]
 
-  (def token (config :token))
-
   ;; Mostly here for repl sessions and debugging
   ;; being able to look at javadocs quickly is real nice
   (add-remote-javadoc "net.dv8tion.jda." "https://ci.dv8tion.net/job/JDA/javadoc/")
   
   (def listener
     (proxy [ListenerAdapter] []
-      (onReady [event] 
-        (log/info "Successfully logged in!"))
-      
+            
       (onMessageReceived [event] 
         (log-message event)
         (if (safe-to-eval? event)
           (eval-command event)))))
   
-  (def carlisle (.. (JDABuilder/createDefault token)
+  (def carlisle (.. (JDABuilder/createDefault (config :token))
                     (addEventListeners (into-array Object [listener]))
                     (build))))
 
