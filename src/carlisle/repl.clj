@@ -38,6 +38,11 @@
     (.queue (.. channel (sendMessage fmt)))
     fmt))
 
+(defn reply-embed
+  [embed]
+  (.. channel (sendMessage embed) queue))
+  
+
 (defn bruh [q]
   (-> (format "https://api.wolframalpha.com/v2/query?input=%s&appid=%s" 
               (str/replace q " " "%20")
@@ -58,28 +63,28 @@
   "Writing code in blocks for syntax highlighting is nice, but breaks the evaluator.
   This strips the blocks (and the language identifier) from the text."
   [msg]
-  (if (and
-       (str/starts-with? msg "```")
-       (str/ends-with? msg "```"))
-    (str/replace msg #"(^.*?\s)|(\n.*$)" "" )
-    msg))
+  (format "(do %s)"
+          (if (and
+               (str/starts-with? msg "```")
+               (str/ends-with? msg "```"))
+            (str/replace msg #"(^.*?\s)|(\n.*$)" "" )
+            msg)))
 
 (defn safe-to-eval? 
   "Ensures that an eval is intended, and it is sent my owner"
   [event]
   (and 
    (-> (.. event getMessage getContentDisplay)
-       (str/replace "\n" " ")
        (str/split #"\s")
        (first)
-       (= "!e"))
+       (= (config :prefix)))
    (= 
     (.. event getAuthor getId)
     (config :owner))))
 
 (defn- eval-to-map [txt]
   (with-out-result-map 
-    (try (eval (read-string (strip-codeblock txt)))
+    (try (eval (read-string (strip-codeblock txt )))
          (catch Exception e (format "%nException: %s%nCause: %s"
                                     (.getMessage e)
                                     (.getCause e))))))
@@ -114,13 +119,13 @@
                  author (.. _event getAuthor)
                  channel (.. _event getChannel)
                  msg (.. _event getMessage)
-                 txt (->> (.. _event getMessage getContentDisplay (str/split " "))
-                          (filter #(not (str/blank? %)))
-                          (rest)
-                          (str/join " "))
+                 txt (str/replace-first (.. _event getMessage getContentDisplay) 
+                                        #"^\S*\s"
+                                        "")
                  guild (if (.. _event (isFromType ChannelType/TEXT))
                          (.. _event getGuild)
                          nil)]
+         (println txt)
          (let [result-map (eval-to-map txt)
                result (result-map :result)
                out (result-map :out)
@@ -133,4 +138,4 @@
 (-> (slurp "https://api.warframestat.us/pc/voidTrader")
     (json/read-str :key-fn keyword)
     (str/replace "," "\n"))
-      
+   

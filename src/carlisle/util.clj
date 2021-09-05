@@ -8,8 +8,9 @@
 
 (defmacro with-out-result-map
   [& body]
-  `(let [s# (new java.io.StringWriter)]
-     (binding [*out* s#]
+  `(let [s# (java.io.StringWriter.)]
+     (binding [*out* s#
+               *flush-on-newline* false]
        (let [r# ~@body]
          {:result r#
           :out (str s#)}))))
