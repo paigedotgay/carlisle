@@ -4,14 +4,10 @@
 * [About](README.md)
 
 * Commands
-  * [Placeholder](qanazoga.com)
-  * [Placeholder](qanazoga.com)
-  * [Placeholder](qanazoga.com)
-  
+  * [warframe](commands/warframe.md)
+    
 * Modules
-  * [Placeholder](qanazoga.com)
-  * [Placeholder](qanazoga.com)
-  * [Placeholder](qanazoga.com)
+  * [eval](modules/eval.md)
   
 * Additional info
   * [References](references.md)
