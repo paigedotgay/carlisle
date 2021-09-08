@@ -1,4 +1,4 @@
-(ns carlisle.warframe
+(ns carlisle.commands.warframe
   (:gen-class)
   (:use [carlisle.config :only [config]] 
         [carlisle.util]

@@ -2,8 +2,9 @@
   (:gen-class)
   (:use [carlisle.config :only [config]] 
         [carlisle.logging :only [log-message]]
-        [carlisle.warframe]
-        [carlisle.repl]
+        [carlisle.commands.warframe]
+        [carlisle.commands.repl]
+        [carlisle.commands.dbd]
         [clojure.java.javadoc])
   (:import [net.dv8tion.jda.api JDABuilder Permission]
            [net.dv8tion.jda.api.events.message MessageReceivedEvent]
@@ -31,7 +32,8 @@
       
       (onSlashCommand [event]
         (case (.getName event)
-          "warframe" (warframe-command event)))))
+          "warframe"         (warframe-command event)
+          "dead-by-daylight" (dead-by-daylight-command event)))))
   
   (def carlisle (.. (JDABuilder/create 
                      (config :token) [GatewayIntent/GUILD_MEMBERS 

@@ -1,4 +1,4 @@
-(ns carlisle.repl
+(ns carlisle.commands.repl
   (:gen-class)
   (:use [carlisle.config :only [config]] 
         [carlisle.util]
@@ -113,7 +113,7 @@
   guild   - The guild the command was sent in
   *last*  - The result of the last evaluation"
   [_event] 
-  (->> (binding [*ns* (find-ns 'carlisle.repl)
+  (->> (binding [*ns* (find-ns 'carlisle.commands.repl)
                  event _event
                  bot (.. _event getJDA)
                  author (.. _event getAuthor)
@@ -135,7 +135,3 @@
            result))
        (def ^:dynamic *last*)))
 
-(-> (slurp "https://api.warframestat.us/pc/voidTrader")
-    (json/read-str :key-fn keyword)
-    (str/replace "," "\n"))
-   
