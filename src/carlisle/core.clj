@@ -2,7 +2,7 @@
   (:gen-class)
   (:use [carlisle.config :only [config]] 
         [carlisle.logging :only [log-message]]
-        [carlisle.commands.warframe]
+        [carlisle.commands.wf]
         [carlisle.commands.repl]
         [carlisle.commands.dbd]
         [clojure.java.javadoc])

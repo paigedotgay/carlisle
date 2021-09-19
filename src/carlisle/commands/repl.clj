@@ -1,7 +1,7 @@
 (ns carlisle.commands.repl
   (:gen-class)
   (:use [carlisle.config :only [config]] 
-        [carlisle.util]
+        [carlisle.utils.general]
         [clojure.java.javadoc]
         [clojure.repl])
   (:require [clojure.string :as str]
@@ -73,12 +73,12 @@
 (defn safe-to-eval? 
   "Ensures that an eval is intended, and it is sent my owner"
   [event]
+  (println "checking safety")
   (and 
-   (-> (.. event getMessage getContentDisplay)
-       (str/split #"\s")
-       (first)
-       (= (config :prefix)))
-   (= 
+   (some #{(.. event getJDA getSelfUser)}
+         (.. event getMessage getMentionedUsers))
+   
+   (=
     (.. event getAuthor getId)
     (config :owner))))
 
