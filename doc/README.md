@@ -1,12 +1,12 @@
 # Introduction to Carlisle
 
 ## About
-My 3rd Discord bot, written in Clojure + Kotlin!  
-- To invite Carlisle, click [here](https://discord.com/api/oauth2/authorize?client_id=829523205592055848&permissions=8&scope=bot).  
-- For the official support server, click [here](http://discord.carlisle.qanazoga.com)
+My 3rd Discord bot, written in Clojure!  
+- To invite Carlisle, use https://invite.carlisle-bot.com.  
+- For the official support server, use https://discord.carlisle-bot.com  
 - Repos: [GitLab](https://gitlab.com/qanazoga/carlisle) (main) and [GitHub](https://github.com/qanazoga/carlisle-bot) (mirror)
 
-These docs are made using GitBook (because I understand it), but might be automated in the future...
+<iframe src="https://discord.com/widget?id=279319437377536002&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
 
 ## Planned Features
 Ideally, Carlisle should be able to do everything [Hallita](https://gitlab.com/soturi/hallita-variants/hallita.js) could, and hopefully some of the things only [Soturi](https://gitlab.com/soturi/soturi-variants/soturi) could (and also some of Hallita's planned things I never finished).
