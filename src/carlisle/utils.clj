@@ -1,4 +1,4 @@
-(ns carlisle.utils.general
+(ns carlisle.utils
   (:gen-class)
   (:require [clojure.string :as str])
   (:use [carlisle.config :only [config]])
@@ -19,5 +19,6 @@
 
 (defn build-basic-embed [event]
     (.. (EmbedBuilder.)
+        (setColor 4708752)
         (setFooter "<3#3333 made this (◍•ᴗ•◍)" 
                    (.. event getJDA (getUserById (config :owner)) getAvatarUrl))))

@@ -2,9 +2,10 @@
   (:gen-class)
   (:use [carlisle.config :only [config]] 
         [carlisle.logging :only [log-message]]
-        [carlisle.commands.wf]
-        [carlisle.commands.repl]
-        [carlisle.commands.dbd]
+        [carlisle.ask.command]
+        [carlisle.dead-by-daylight.command]
+        [carlisle.repl.command]
+        [carlisle.warframe.command]
         [clojure.java.javadoc])
   (:import [net.dv8tion.jda.api JDABuilder Permission]
            [net.dv8tion.jda.api.events.message MessageReceivedEvent]
@@ -32,19 +33,20 @@
       
       (onSlashCommand [event]
         (case (.getName event)
+          "ask"              (ask-command event)
           "warframe"         (warframe-command event)
           "dead-by-daylight" (dead-by-daylight-command event)))))
   
-  (def carlisle (.. (JDABuilder/create 
-                     (config :token) [GatewayIntent/GUILD_MEMBERS 
-                                      GatewayIntent/GUILD_PRESENCES
-                                      GatewayIntent/GUILD_BANS 
-                                      GatewayIntent/GUILD_EMOJIS 
-                                      GatewayIntent/GUILD_VOICE_STATES 
-                                      GatewayIntent/GUILD_MESSAGES 
-                                      GatewayIntent/GUILD_MESSAGE_REACTIONS 
-                                      GatewayIntent/DIRECT_MESSAGES 
-                                      GatewayIntent/DIRECT_MESSAGE_REACTIONS])
+  (def carlisle (.. (JDABuilder/create (config :token) 
+                                       [GatewayIntent/GUILD_MEMBERS 
+                                        GatewayIntent/GUILD_PRESENCES
+                                        GatewayIntent/GUILD_BANS 
+                                        GatewayIntent/GUILD_EMOJIS 
+                                        GatewayIntent/GUILD_VOICE_STATES 
+                                        GatewayIntent/GUILD_MESSAGES 
+                                        GatewayIntent/GUILD_MESSAGE_REACTIONS 
+                                        GatewayIntent/DIRECT_MESSAGES 
+                                        GatewayIntent/DIRECT_MESSAGE_REACTIONS])
                     (enableCache [CacheFlag/CLIENT_STATUS
                                   CacheFlag/EMOTE
                                   CacheFlag/MEMBER_OVERRIDES

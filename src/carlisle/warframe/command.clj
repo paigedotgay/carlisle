@@ -1,6 +1,6 @@
-(ns carlisle.commands.wf
+(ns carlisle.warframe.command
   (:gen-class)
-  (:use [carlisle.utils.wf])
+  (:use [carlisle.warframe.utils])
   (:import [net.dv8tion.jda.api.events.interaction SelectionMenuEvent]
            [net.dv8tion.jda.api.hooks ListenerAdapter]
            [net.dv8tion.jda.api.interactions.commands OptionType]

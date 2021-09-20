@@ -1,11 +1,10 @@
-(ns carlisle.commands.dbd
+(ns carlisle.dead-by-daylight.command
   (:gen-class)
   (:use [carlisle.config :only [config]])
   (:require [camel-snake-kebab.core :as csk]
             [clojure.data.json :as json])
   (:import [net.dv8tion.jda.api EmbedBuilder]
            [net.dv8tion.jda.api.events.interaction SelectionMenuEvent]
-           [net.dv8tion.jda.api.hooks ListenerAdapter]
            [net.dv8tion.jda.api.interactions.commands OptionType Command]
            [net.dv8tion.jda.api.interactions.commands.build CommandData OptionData]
            [net.dv8tion.jda.api.interactions.components.selections SelectionMenu]))

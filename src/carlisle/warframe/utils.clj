@@ -1,7 +1,7 @@
-(ns carlisle.utils.wf
+(ns carlisle.warframe.utils
   (:gen-class)
   (:use [carlisle.config :only [config]]
-        [carlisle.utils.general]) 
+        [carlisle.utils]) 
   (:require [camel-snake-kebab.core :as csk]
             [clojure.core.async :as async] 
             [clojure.data.json :as json]

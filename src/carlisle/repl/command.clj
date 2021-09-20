@@ -1,7 +1,7 @@
-(ns carlisle.commands.repl
+(ns carlisle.repl.command
   (:gen-class)
   (:use [carlisle.config :only [config]] 
-        [carlisle.utils.general]
+        [carlisle.utils]
         [clojure.java.javadoc]
         [clojure.repl])
   (:require [clojure.string :as str]
@@ -9,7 +9,8 @@
             [clojure.data.xml :as xml])
   (:import [java.io ByteArrayOutputStream PrintStream PrintWriter OutputStreamWriter]
            [net.dv8tion.jda.api.events.message MessageReceivedEvent]
-           [net.dv8tion.jda.api.entities ChannelType]))
+           [net.dv8tion.jda.api.entities ChannelType Message$MentionType]
+           [net.dv8tion.jda.api.utils MarkdownSanitizer]))
 
 ;; Mostly here for repl sessions and debugging
 ;; being able to look at javadocs quickly is real nice
@@ -42,7 +43,6 @@
   [embed]
   (.. channel (sendMessage embed) queue))
   
-
 (defn bruh [q]
   (-> (format "https://api.wolframalpha.com/v2/query?input=%s&appid=%s" 
               (str/replace q " " "%20")
@@ -59,32 +59,29 @@
       first
       reply))
 
-(defn strip-codeblock 
-  "Writing code in blocks for syntax highlighting is nice, but breaks the evaluator.
-  This strips the blocks (and the language identifier) from the text."
-  [msg]
-  (format "(do %s)"
-          (if (and
-               (str/starts-with? msg "```")
-               (str/ends-with? msg "```"))
-            (str/replace msg #"(^.*?\s)|(\n.*$)" "" )
-            msg)))
-
 (defn safe-to-eval? 
-  "Ensures that an eval is intended, and it is sent my owner"
+  "Ensures that an eval is intended, and it is sent by owner"
   [event]
   (println "checking safety")
-  (and 
-   (some #{(.. event getJDA getSelfUser)}
-         (.. event getMessage getMentionedUsers))
-   
-   (=
-    (.. event getAuthor getId)
-    (config :owner))))
+  (let [msg (.. event getMessage)]
+    (and 
+     
+     (.. msg (isMentioned
+              (.. event getJDA getSelfUser)
+              (into-array Message$MentionType [Message$MentionType/USER Message$MentionType/ROLE])))
+
+     (-> msg 
+         (.getContentRaw)
+         (str/split #" ")
+         first)
+      
+     (=
+      (.. event getAuthor getId)
+      (config :owner)))))
 
 (defn- eval-to-map [txt]
   (with-out-result-map 
-    (try (eval (read-string (strip-codeblock txt )))
+    (try (eval (read-string (MarkdownSanitizer/sanitize txt )))
          (catch Exception e (format "%nException: %s%nCause: %s"
                                     (.getMessage e)
                                     (.getCause e))))))
@@ -113,13 +110,13 @@
   guild   - The guild the command was sent in
   *last*  - The result of the last evaluation"
   [_event] 
-  (->> (binding [*ns* (find-ns 'carlisle.commands.repl)
+  (->> (binding [*ns* (find-ns 'carlisle.repl.command)
                  event _event
                  bot (.. _event getJDA)
                  author (.. _event getAuthor)
                  channel (.. _event getChannel)
                  msg (.. _event getMessage)
-                 txt (str/replace-first (.. _event getMessage getContentDisplay) 
+                 txt (str/replace-first (.. _event getMessage getContentRaw) 
                                         #"^\S*\s"
                                         "")
                  guild (if (.. _event (isFromType ChannelType/TEXT))
