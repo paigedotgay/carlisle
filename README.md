@@ -6,8 +6,6 @@ A while back I tried making a version of my Discord Bot, [Hallita](https://gitla
 
 I'm learning Clojure right now, and got a bot to work with Clojure and [JDA](https://github.com/DV8FromTheWorld/JDA) some time ago, however, that was just a test to see if I could Eval Clojure inside JDA. I want a full bot.
 
-I want to keep the easy to write commands of Kotlin, but do the base of the bot in Clojure so I can still do nice and clean Eval commands. Thanks JVM!
-
 ---
 
 ### Planned Features
