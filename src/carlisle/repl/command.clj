@@ -3,6 +3,7 @@
   (:use [carlisle.config :only [config]] 
         [carlisle.utils]
         [clojure.java.javadoc]
+        [clojure.java.shell]
         [clojure.repl])
   (:require [clojure.string :as str]
             [clojure.data.json :as json]
@@ -42,22 +43,18 @@
 (defn reply-embed
   [embed]
   (.. channel (sendMessage embed) queue))
-  
-(defn bruh [q]
-  (-> (format "https://api.wolframalpha.com/v2/query?input=%s&appid=%s" 
-              (str/replace q " " "%20")
-              (config :wolfram-token))
-      (slurp)
-      (xml/parse-str)
-      :content
-      rest first
-      :content
-      first
-      :content
-      last
-      :content
-      first
-      reply))
+
+(defn shell 
+  "shortcut to `sh` but with pretty formatting"
+  [commands]
+  (let [{sysout :out syserr :err} (apply sh (str/split commands #" "))
+        out (if-not (str/blank? sysout) 
+              sysout
+              "")
+        err (if-not (str/blank? syserr) 
+              syserr
+              "")]
+    (println out err)))
 
 (defn safe-to-eval? 
   "Ensures that an eval is intended, and it is sent by owner"
@@ -96,7 +93,7 @@
                     (format "Return: ```clj%n%s```"))
                (if (str/blank? out)
                  ""
-                 (format "Out: ```clj%n%s```" out))])))
+                 (format "Out: ```bash%n%s```" out))])))
   
 (defn eval-command 
   "Evaluate arbitrary code.
