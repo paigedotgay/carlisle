@@ -6,7 +6,7 @@ My 3rd Discord bot, written in Clojure!
 - For the official support server, use https://discord.carlisle-bot.com  
 - Repos: [GitLab](https://gitlab.com/qanazoga/carlisle) (main) and [GitHub](https://github.com/qanazoga/carlisle-bot) (mirror)
 
-<iframe src="https://discord.com/widget?id=279319437377536002&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+<iframe src="https://discord.com/widget?id=279319437377536002&theme=dark" width="auto" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
 
 ## Planned Features
 Ideally, Carlisle should be able to do everything [Hallita](https://gitlab.com/soturi/hallita-variants/hallita.js) could, and hopefully some of the things only [Soturi](https://gitlab.com/soturi/soturi-variants/soturi) could (and also some of Hallita's planned things I never finished).
