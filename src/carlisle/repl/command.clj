@@ -59,7 +59,6 @@
 (defn safe-to-eval? 
   "Ensures that an eval is intended, and it is sent by owner"
   [event]
-  (println "checking safety")
   (let [msg (.. event getMessage)]
     (and 
      
