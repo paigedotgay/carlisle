@@ -47,9 +47,16 @@
   (let [query (.. event (getOption "query") getAsString)
         ephemeral? (if (= 2 (count (.getOptions event)))
                      (not (.. event (getOption "show-everyone") getAsBoolean))
-                     true)]
+                     true)
+        result (perform-query query)
+        response (if (str/blank? result)
+                   ("Something went wrong, tell Paige")
+                   (format "__**%s's query:**__\n\t\"%s\"\n__**Result:**__\n\t%s"
+                           (.. event getAuthor getAsMention)
+                           query
+                           result))]
     (.. event deferReply (setEphemeral ephemeral?) queue)
     (.. event 
         getHook 
-        (sendMessage (perform-query query))
+        (sendMessage response)
         (queue))))
