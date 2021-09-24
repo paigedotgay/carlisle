@@ -5,7 +5,8 @@
         [clojure.java.javadoc]
         [clojure.java.shell]
         [clojure.repl])
-  (:require [clojure.string :as str]
+  (:require [clojure.core.async :as async]
+            [clojure.string :as str]
             [clojure.data.json :as json]
             [clojure.data.xml :as xml])
   (:import [java.io ByteArrayOutputStream PrintStream PrintWriter OutputStreamWriter]
@@ -47,7 +48,7 @@
 (defn shell 
   "shortcut to `sh` but with pretty formatting"
   [commands]
-  (let [{sysout :out syserr :err} (apply sh (str/split commands #" "))
+  (let [{code :exit sysout :out syserr :err} (apply sh (str/split commands #" "))
         out (if-not (str/blank? sysout) 
               sysout
               "")
@@ -56,28 +57,52 @@
               "")]
     (println out err)))
 
+(defn restart!
+  "updates and restarts the bot, use :update? false to just restart"
+  [& {:keys [update?]
+      :or {update? true}}]
+  (let [result (if update? 
+                 (format "👋%n```bash%n%s```"
+                         (:out (sh "git" "pull")))
+                 "👋")]  
+    (async/thread    
+      (.. channel (sendMessage result) queue)
+      (Thread/sleep 2500)
+      (.shutdown bot)
+      (Thread/sleep 2500)
+      (System/exit 0)))
+  "restarting...")
+
 (defn safe-to-eval? 
   "Ensures that an eval is intended, and it is sent by owner"
   [event]
-  (let [msg (.. event getMessage)]
+  (let [guild (if (.. event (isFromType ChannelType/TEXT))
+                         (.. event getGuild)
+                         nil)
+        msg (.. event getMessage)
+        names [(if guild (.. guild getBotRole getId))
+               (.. event getJDA getSelfUser getId)]]
+
+    (println names)
+    
     (and 
      
      (.. msg (isMentioned
               (.. event getJDA getSelfUser)
               (into-array Message$MentionType [Message$MentionType/USER Message$MentionType/ROLE])))
 
-     (-> msg 
-         (.getContentRaw)
+     (-> (.getContentRaw msg)
          (str/split #" ")
-         first)
-      
+         (first)
+         (str/replace #"\D" ""))
+
      (=
       (.. event getAuthor getId)
       (config :owner)))))
 
 (defn- eval-to-map [txt]
   (with-out-result-map 
-    (try (eval (read-string (MarkdownSanitizer/sanitize txt )))
+    (try (eval (read-string  (format "(do %s)"( MarkdownSanitizer/sanitize txt))))
          (catch Exception e (format "%nException: %s%nCause: %s"
                                     (.getMessage e)
                                     (.getCause e))))))
@@ -127,4 +152,3 @@
            (reply response)
            result))
        (def ^:dynamic *last*)))
-
