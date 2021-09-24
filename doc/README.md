@@ -1,5 +1,7 @@
 # Introduction to Carlisle
 
+Note: this may be moved to https://repo.carlisle-bot.com/wikis
+
 ## About
 My 3rd Discord bot, written in Clojure!  
 - To invite Carlisle, use https://invite.carlisle-bot.com.  
