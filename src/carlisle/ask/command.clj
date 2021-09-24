@@ -20,7 +20,7 @@
         (slurp)
         (xml/parse-str)
         :content
-        rest first
+        second
         :content
         first
         :content
@@ -28,8 +28,6 @@
         :content
         first)
     (catch Exception e "Something went wrong, tell Paige")))
-
-
 
 (def ask-command-data
   (.. (CommandData. "ask" "general info")

@@ -30,8 +30,7 @@
 (declare ^:dynamic *last*)
 
 (defn reply 
-  "shortcut to reply in current channel
-  don't use outside of an eval command" 
+  "shortcut to reply in current channel" 
   [msg]
   (let [fmt (if (<= 2000 (count msg))
               (if (or (str/starts-with? "```" msg) (str/starts-with? "```clj" msg))
@@ -76,26 +75,32 @@
 (defn safe-to-eval? 
   "Ensures that an eval is intended, and it is sent by owner"
   [event]
-  (let [guild (if (.. event (isFromType ChannelType/TEXT))
-                         (.. event getGuild)
-                         nil)
-        msg (.. event getMessage)
-        names [(if guild (.. guild getBotRole getId))
-               (.. event getJDA getSelfUser getId)]]
-
-    (println names)
+  (let [msg (.. event getMessage)
+        ids #{(if (.. event (isFromType ChannelType/TEXT)) (.. event getGuild getBotRole getId))
+              (.. event getJDA getSelfUser getId)}]
     
-    (and 
-     
+    (and
+     ;; make sure the bot is mentioned
      (.. msg (isMentioned
               (.. event getJDA getSelfUser)
               (into-array Message$MentionType [Message$MentionType/USER Message$MentionType/ROLE])))
 
-     (-> (.getContentRaw msg)
-         (str/split #" ")
-         (first)
-         (str/replace #"\D" ""))
+     ;; make sure the mention is at the start of the message
+     (contains? ids
+                (-> (.getContentRaw msg)
+                    (str/split #" ")
+                    (first)
+                    (str/replace #"\D" "")))
 
+     ;; make sure the start is *actually* a mention
+     (not= (-> (.getContentRaw msg)
+                    (str/split #"\s")
+                    (first))
+           (-> (.getContentDisplay msg)
+                    (str/split #"\s")
+                    (first)))
+
+     ;; make sure message is sent by owner
      (=
       (.. event getAuthor getId)
       (config :owner)))))
@@ -125,9 +130,9 @@
   event   - The MessageReceivedEvent
   bot     - The bot
   author  - You
-  channel - The channel the command was sent in
+  channel - The MessageChannel the command was sent in
   msg     - The Message object
-  txt     - The message, minus the !e
+  txt     - The message, minus the invoking mention
   guild   - The guild the command was sent in
   *last*  - The result of the last evaluation"
   [_event] 
