@@ -65,7 +65,7 @@
                          (:out (sh "git" "pull")))
                  "👋")]  
     (async/thread    
-      (.. channel (sendMessage result) queue)
+      (reply result)
       (Thread/sleep 2500)
       (.shutdown bot)
       (Thread/sleep 2500)
