@@ -22,3 +22,8 @@
         (setColor 4708752)
         (setFooter "<3#3333 made this (◍•ᴗ•◍)" 
                    (.. event getJDA (getUserById (config :owner)) getAvatarUrl))))
+
+(defn ^java.util.function.Consumer then [f]
+  "Converts a function to java.util.function.Consumer, use in .queue to make things happen after"
+  (reify java.util.function.Consumer
+    (accept [this arg] (f arg))))
