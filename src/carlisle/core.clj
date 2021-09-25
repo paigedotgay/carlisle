@@ -4,6 +4,7 @@
         [carlisle.logging :only [log-message]]
         [carlisle.ask.command]
         [carlisle.dead-by-daylight.command]
+        [carlisle.mtg.command]
         [carlisle.repl.command]
         [carlisle.warframe.command]
         [clojure.java.javadoc])
@@ -35,7 +36,8 @@
         (case (.getName event)
           "ask"              (ask-command event)
           "warframe"         (warframe-command event)
-          "dead-by-daylight" (dead-by-daylight-command event)))))
+          "dead-by-daylight" (dead-by-daylight-command event)
+          "mtg"              (mtg-command event)))))
   
   (def carlisle (.. (JDABuilder/create (config :token) 
                                        [GatewayIntent/GUILD_MEMBERS 
