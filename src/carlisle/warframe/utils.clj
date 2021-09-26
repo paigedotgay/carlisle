@@ -18,11 +18,11 @@
   "Returns a set (of one) embed detailing Baro's status.
   a set is used because a collection is expected"
   [event]
-  (set (.. (build-basic-embed event)
+  #{ (.. (build-basic-embed event)
            (setTitle "The Void Trader isn't here...")
            (setThumbnail baro-img)
            (setDescription (str "he will arrive in " (-> @worldstate :void-trader :start-string)))
-           (build))))
+           (build))})
 
 (defn void-trader-embed-active-template
   [event]
