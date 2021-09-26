@@ -55,7 +55,6 @@
                                   CacheFlag/ROLE_TAGS
                                   CacheFlag/VOICE_STATE])
                     (setMemberCachePolicy MemberCachePolicy/ALL)
-                    (addEventListeners (into-array Object [message-listener 
-                                                           warframe-command-menu-listener]))
+                    (addEventListeners (into-array Object [message-listener]))
                     (build))))
 

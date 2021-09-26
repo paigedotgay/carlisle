@@ -43,7 +43,7 @@
 (defn ask-command 
   [event]
   (let [query (.. event (getOption "query") getAsString)
-        ephemeral? (if (= 2 (count (.getOptions event)))
+        ephemeral? (if-not (empty? (.. event (getOptionsByName "show-everyone")))
                      (not (.. event (getOption "show-everyone") getAsBoolean))
                      true)]
     (.. event deferReply (setEphemeral ephemeral?) queue)
