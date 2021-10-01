@@ -7,38 +7,26 @@
            [net.dv8tion.jda.api.interactions.commands.build CommandData OptionData]
            [net.dv8tion.jda.api.interactions.components.selections SelectionMenu]))
 
+(start-api-updates)
+
 (def warframe-command-data
-  (-> (CommandData. "warframe" "gets information about Warframe PC Worldstate")
-      (.addOption OptionType/STRING "key" "The topic you need information about" false)))
-
-(def warframe-command-menu
-  (-> (SelectionMenu/create "warframe-menu")
-      (.setPlaceholder "What do you need information about?")
-      (.setRequiredRange 1 1)
-      (.addOption "Void Trader" "void-trader")
-      (.build)))
-
-(def warframe-command-menu-listener
-  (proxy [ListenerAdapter] []
-    (onSelectionMenu [event]
-      (let [key (-> (.getValues event)
-                    (first)
-                    (keyword))]
-            (.. event getMessage delete queue)
-            (.. event
-                (replyEmbeds [(build-void-trader-embed event)])
-                (setEphemeral true)
-                (queue))))))
+  (.. (CommandData. "warframe" "gets information about Warframe PC Worldstate")
+      (addOptions [(.. (OptionData. OptionType/STRING "query" "What do you need information about?" true)
+                       (addChoice "Void Trader / Baro Ki'Teer" "void-trader"))
+                   
+                   (OptionData. OptionType/BOOLEAN 
+                                "show-everyone" 
+                                "would you like everyone to be able to see the result?")])))
       
 (defn warframe-command 
   [event]
-  (if (zero? (count (.getOptions event)))
-    (.. event (reply "What information do you need?") 
-        (setEphemeral false)
-        (addActionRow [warframe-command-menu])
-        (queue))
-    (-> event 
-        (.replyEmbeds [(build-void-trader-embed event)])
-        (.setEphemeral true)
-        (.queue))))
+  (let [query (.. event (getOption "query") getAsString)
+        ephemeral? (if-not (empty? (.. event (getOptionsByName "show-everyone")))
+                     (not (.. event (getOption "show-everyone") getAsBoolean))
+                     true)]
+
+    (.. event 
+        (replyEmbeds (build-void-trader-embeds event))
+        (setEphemeral ephemeral?)
+        (queue))))
 
