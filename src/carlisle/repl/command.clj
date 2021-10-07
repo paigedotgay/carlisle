@@ -107,13 +107,16 @@
 
 (defn- eval-to-map [txt]
   (with-out-result-map 
-    (try (eval (read-string  (format "(do %s)"( MarkdownSanitizer/sanitize txt))))
+    (try (eval (read-string  (format "(do %s)"(MarkdownSanitizer/sanitize txt))))
          (catch Exception e (format "%nException: %s%nCause: %s"
                                     (.getMessage e)
                                     (.getCause e))))))
 
 (defn- format-response [out-result-map]
-  (let [result (out-result-map :result)
+  (let [res (out-result-map :result)
+        result (if (seq? res)
+                 (str/join " " res)
+                 (str res))
         out (out-result-map :out)]
     (str/join "\n"
               [(->> [(str result) "nil"]
