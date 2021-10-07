@@ -1,9 +1,9 @@
 # Carlisle
 
-[![version]](https://repo.carlisle-bot.com/tags)
+[![support-server]](https://server.carlisle-bot.com)
 [![open-issues]](https://repo.carlisle-bot.com/issues)
 [![closed-issues]](https://gitlab.com/qanazoga/carlisle/-/issues?scope=all&state=closed)
-[![support-server]](https://server.carlisle-bot.com)
+[![last-update]](https://repo.carlisle-bot.com/commits)
 
 This is something I've been trying to get working for a while, and am finally willing to take another stab at.
 
@@ -22,9 +22,7 @@ I'm adding all of these things to the [project issues](https://gitlab.com/qanazo
 - Bring back Soturi's [role signup](https://gitlab.com/soturi/soturi-variants/soturi.py/blob/master/cogs/role_signup_listener.py) feature, but with an easy way to set up that doesn't involve me manually adding entries to an unreadable JSON file.
 - Bring back Soturi's [message filtering](https://gitlab.com/soturi/soturi-variants/soturi.py/blob/master/cogs/free_game_news_moderator.py) because it was great, and make it better by adding more filtering options. Again it should be made easy to set up via OAuth.
 
-
-
-[version]: https://img.shields.io/gitlab/v/tag/qanazoga/carlisle?label=version&sort=date&style=for-the-badge
-[open-issues]: https://img.shields.io/badge/dynamic/json?style=for-the-badge&color=yellow&label=open%20issues&query=statistics.counts.opened&url=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F27978882%2Fissues_statistics
-[closed-issues]: https://img.shields.io/badge/dynamic/json?color=success&label=closed%20issues&query=statistics.counts.closed&url=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F27978882%2Fissues_statistics&style=for-the-badge
-[support-server]: https://img.shields.io/discord/279319437377536002?color=%235663F7%20&label=Support&logo=discord&style=for-the-badge
+[support-server]: https://img.shields.io/discord/279319437377536002?color=%235663F7%20&label=Support&logo=discord&style=flat-square
+[open-issues]: https://img.shields.io/badge/dynamic/json?style=flat-square&color=yellow&label=open%20issues&query=statistics.counts.opened&url=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F27978882%2Fissues_statistics
+[closed-issues]: https://img.shields.io/badge/dynamic/json?color=success&label=closed%20issues&query=statistics.counts.closed&url=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F27978882%2Fissues_statistics&style=flat-square
+[last-update]: https://img.shields.io/badge/dynamic/json?style=flat-square&color=blue&label=Last%20Update&query=last_activity_at&url=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F27978882
