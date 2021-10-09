@@ -27,7 +27,6 @@
 (declare ^:dynamic msg)
 (declare ^:dynamic txt)
 (declare ^:dynamic guild)
-(declare ^:dynamic *last*)
 
 (defn reply 
   "shortcut to reply in current channel" 
@@ -139,24 +138,25 @@
   guild   - The guild the command was sent in
   *last*  - The result of the last evaluation"
   [_event] 
-  (->> (binding [*ns* (find-ns 'carlisle.repl.command)
-                 event _event
-                 bot (.. _event getJDA)
-                 author (.. _event getAuthor)
-                 channel (.. _event getChannel)
-                 msg (.. _event getMessage)
-                 txt (str/replace-first (.. _event getMessage getContentRaw) 
-                                        #"^\S*\s"
-                                        "")
-                 guild (if (.. _event (isFromType ChannelType/TEXT))
-                         (.. _event getGuild)
-                         nil)]
-         (println txt)
-         (let [result-map (eval-to-map txt)
-               result (result-map :result)
-               out (result-map :out)
-               response (format-response result-map)]
-           
-           (reply response)
-           result))
-       (def ^:dynamic *last*)))
+  (binding [*ns* (find-ns 'carlisle.repl.command)
+            event _event
+            bot (.. _event getJDA)
+            author (.. _event getAuthor)
+            channel (.. _event getChannel)
+            msg (.. _event getMessage)
+            txt (str/replace-first (.. _event getMessage getContentRaw) 
+                                   #"^\S*\s"
+                                   "")
+            guild (if (.. _event (isFromType ChannelType/TEXT))
+                    (.. _event getGuild)
+                    nil)]
+    (let [result-map (eval-to-map txt)
+          result (result-map :result)
+          out (result-map :out)
+          response (format-response result-map)]
+      
+      (reply response)
+      (alter-var-root #'*3 (constantly *2))
+      (alter-var-root #'*2 (constantly *1))
+      (alter-var-root #'*1 (constantly result)))))
+       
