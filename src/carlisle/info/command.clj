@@ -13,27 +13,31 @@
 (defn get-millis []
   (.getUptime (java.lang.management.ManagementFactory/getRuntimeMXBean)))
 
-(defn start-formatting [millis]
-  (->>
-    (-> (java.time.Duration/ofMillis millis)
-        (str)
-        (str/split #"\D"))
-    (filterv #(not (str/blank? %)))
-    (reverse)
-    (rest)
-    (zipmap [:seconds :minutes :hours :days :months :years])))
+(defn map-duration [millis]
+  (->>(java.time.Duration/ofMillis millis)
+      (#(zipmap [:seconds :minutes :hours :days]
+                [(.toSeconds %)(.toMinutes %)(.toHours %)(.toDays %)]))))
+
+(defn largest-duration [d]
+  (->> d
+       (filter #(not (zero? (val %))))
+       (last)
+       (apply array-map)))
 
 (defn build-info-embed [event]
   (let [bot (.. event getJDA)
-        ping (.. bot getRestPing complete)]
+        ping (.. bot getRestPing complete)
+        largest (first (largest-duration (map-duration (get-millis))))
+        duration (if (= 1 (val largest))
+                   (str/join "" (drop-last (name (key largest))))
+                   (name (key largest)))]
     (-> (build-basic-embed event)
         (.setThumbnail (.. bot getSelfUser getAvatarUrl))
         (.addField "Guilds:" (str (count (.. bot getGuilds))) true)
         (.addField "Users:" (str (count (.. bot getUsers))) true)
         (.addField "Ping:" (format "%dms" ping) true)
         (.addField "Bot Uptime:" 
-                   (let [largest (last (start-formatting (get-millis)))]
-                     (str (val largest) \space (name (key largest))))
+                     (str (val largest) \space duration)
                    true)
         (.addField "Server Uptime" 
                    (-> (sh "uptime" "-p")
