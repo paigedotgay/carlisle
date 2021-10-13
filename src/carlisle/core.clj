@@ -34,6 +34,11 @@
         (log-message event)
         (if (safe-to-eval? event)
           (eval-command event)))
+
+      (onMessageUpdate [event]
+        (log-message event)
+        (if (safe-to-eval? event)
+          (eval-command event)))
       
       (onSlashCommand [event]
         (try

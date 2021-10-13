@@ -28,14 +28,20 @@
 (declare ^:dynamic txt)
 (declare ^:dynamic guild)
 
-(defn reply 
-  "shortcut to reply in current channel" 
-  [msg]
-  (let [fmt (if (<= 2000 (count msg))
+;; used for edited messages
+(def response-message (atom nil))
+
+(defn trunc-msg [msg]
+  (if (<= 2000 (count msg))
               (if (or (str/starts-with? "```" msg) (str/starts-with? "```clj" msg))
                 (trunc msg 2000)
                 (str (trunc msg 1994) "...```"))
-              msg)]
+              msg))
+
+(defn reply 
+  "shortcut to reply in current channel" 
+  [msg]
+  (let [fmt (trunc-msg msg)]
     (.queue (.. channel (sendMessage fmt)))
     fmt))
 
@@ -153,9 +159,20 @@
     (let [result-map (eval-to-map txt)
           result (result-map :result)
           out (result-map :out)
-          response (format-response result-map)]
+          response (format-response result-map)
+          out-message (if (and (.isEdited msg)
+                               (some? @response-message)
+                               (try (.. channel
+                                        (retrieveMessageById (.getId @response-message)) 
+                                        (complete))
+                                    (catch net.dv8tion.jda.api.exceptions.ErrorResponseException e nil))
+                               (= msg (.. @response-message getReferencedMessage)))
+                        (try
+                          (.. @response-message (editMessage (trunc-msg response)))
+                          (catch Exception e (.. msg (reply (trunc-msg response)))))
+                          (.. msg (reply (trunc-msg response))))]
       
-      (reply response)
+      (reset! response-message (.. out-message complete))
       (alter-var-root #'*3 (constantly *2))
       (alter-var-root #'*2 (constantly *1))
       (alter-var-root #'*1 (constantly result)))))
