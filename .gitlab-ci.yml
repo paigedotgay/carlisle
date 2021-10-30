@@ -7,11 +7,11 @@
 pages:
   stage: deploy
   script:
-    - mkdir .docs
-    - cp -v -r * .docs
-    - mv .docs docs
+    - mkdir .doc
+    - cp -v -r * .doc
+    - mv .doc doc
   artifacts:
     paths:
-      - docs
+      - doc
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
