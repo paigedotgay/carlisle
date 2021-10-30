@@ -62,7 +62,7 @@
                 (queue)))))))
   
   (def carlisle (.. (JDABuilder/create (config :token) 
-                                       [GatewayIntent/GUILD_MEMBERS 
+                                       [GatewayIntent/GUILD_MEMBERS
                                         GatewayIntent/GUILD_PRESENCES
                                         GatewayIntent/GUILD_BANS 
                                         GatewayIntent/GUILD_EMOJIS 
@@ -77,6 +77,6 @@
                                   CacheFlag/ROLE_TAGS
                                   CacheFlag/VOICE_STATE])
                     (setMemberCachePolicy MemberCachePolicy/ALL)
-                    (addEventListeners (into-array Object [message-listener role-signup-listener]))
+                    (addEventListeners (into-array Object [message-listener role-signup-button-listener]))
                   (build))))
 
