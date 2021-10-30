@@ -8,7 +8,7 @@ pages:
   stage: deploy
   script:
     - mkdir .docs
-    - cp -r * .docs
+    - cp -v -r * .docs
     - mv .docs docs
   artifacts:
     paths:
