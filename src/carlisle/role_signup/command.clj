@@ -27,12 +27,12 @@
 (defn get-desired-roles [event] 
   (let [mode (.. event getSubcommandName)
         selected-roles (map #(.getAsRole %) (.. event (getOptionsByType OptionType/ROLE)))
-        legal-roles (reverse (filter #(and (not (.isManaged %))
-                                           (not (.isPublicRole %))
-                                           (.. event getMember (canInteract %)))
-                                     (.. event getGuild getRoles)))]
+        legal-roles (filter #(and (not (.isManaged %))
+                                  (not (.isPublicRole %))
+                                  (.. event getMember (canInteract %)))
+                            (.. event getGuild getRoles))]
     (case mode
-      "selection-mode" (set (filter #((set legal-roles) %) selected-roles))
+      "selection-mode" (filter #((set legal-roles) %) selected-roles)
       "all-roles-mode" legal-roles
       "exclusion-mode" (remove (set selected-roles) legal-roles)
       (throw (Exception. "no known mode selected")))))
@@ -73,8 +73,9 @@
         missing-permission? (if member 
                               (not (.. member (hasPermission [Permission/MANAGE_ROLES]))) 
                               true)
-        message (or (.. event (getOption "message") getAsString) 
-                    "Sign up for roles here!")]
+        message (if-some [msg (.. event (getOption "message"))]
+                  (.getAsString msg)
+                  "Sign up for roles here!")]
     
     (cond 
       in-dm? 
