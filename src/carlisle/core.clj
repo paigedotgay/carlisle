@@ -7,6 +7,7 @@
         [carlisle.info.command]
         [carlisle.mtg.command]
         [carlisle.repl.command]
+        [carlisle.role-signup.command]
         [carlisle.utils]
         [carlisle.warframe.command]
         [clojure.java.javadoc])
@@ -47,7 +48,8 @@
             "dead-by-daylight" (dead-by-daylight-command event)
             "info"             (info-command event)
             "mtg"              (mtg-command event)
-            "warframe"         (warframe-command event))
+            "warframe"         (warframe-command event)
+            "role-signup"      (role-signup-command event))
           
           (catch Exception e  
             (.. event
@@ -60,7 +62,7 @@
                 (queue)))))))
   
   (def carlisle (.. (JDABuilder/create (config :token) 
-                                       [GatewayIntent/GUILD_MEMBERS 
+                                       [GatewayIntent/GUILD_MEMBERS
                                         GatewayIntent/GUILD_PRESENCES
                                         GatewayIntent/GUILD_BANS 
                                         GatewayIntent/GUILD_EMOJIS 
@@ -75,6 +77,6 @@
                                   CacheFlag/ROLE_TAGS
                                   CacheFlag/VOICE_STATE])
                     (setMemberCachePolicy MemberCachePolicy/ALL)
-                    (addEventListeners (into-array Object [message-listener]))
+                    (addEventListeners (into-array Object [message-listener role-signup-button-listener]))
                   (build))))
 
