@@ -8,20 +8,24 @@
            [net.dv8tion.jda.api.events.interaction SelectionMenuEvent]
            [net.dv8tion.jda.api.hooks ListenerAdapter]
            [net.dv8tion.jda.api.interactions.commands OptionType Command]
-           [net.dv8tion.jda.api.interactions.commands.build CommandData OptionData]
+           [net.dv8tion.jda.api.interactions.commands.build CommandData OptionData SubcommandData]
            [net.dv8tion.jda.api.interactions.components ActionRow Button]))
 
 (def role-signup-command-data
   (.. (CommandData. "role-signup" "Set up a way for users to enrole themselves.")
-      (addOptions (flatten [(.. (OptionData. OptionType/STRING "mode" "which method do you want to use to select roles?" true)
-                                (addChoice "Create Buttons For Only Selected Roles (below your maximum role) (recommended)" "selection-mode")
-                                (addChoice "Create Buttons For ALL ROLES (below your maximum role)" "all-roles-mode")
-                                (addChoice "Create Buttons For ALL ROLES (below your maximum role) EXCEPT the selected roles" "exclusion-mode"))
-                            
-                            (for [i (range 24)] (OptionData. OptionType/ROLE (str "role-" (inc i)) "Select a Role (Optional)" false))]))))
+      (addSubcommands #{(.. (SubcommandData. "selection-mode" "Create Buttons For Only Selected Roles (below your maximum role) (recommended)")
+                            (addOption OptionType/STRING "message" "What would you like the message attactched to the buttons to say?")
+                            (addOptions (for [i (range 24)] (OptionData. OptionType/ROLE (str "role-" (inc i)) "Select a Role (Optional)" false))))
+
+                        (.. (SubcommandData. "all-roles-mode" "Create Buttons For ALL ROLES (below your maximum role)")
+                            (addOption OptionType/STRING "message" "What would you like the message attactched to the buttons to say?"))
+
+                        (.. (SubcommandData. "exclusion-mode" "Create Buttons For ALL ROLES (below your maximum role) EXCEPT the selected roles")
+                            (addOption OptionType/STRING "message" "What would you like the message attactched to the buttons to say?")
+                            (addOptions (for [i (range 24)] (OptionData. OptionType/ROLE (str "role-" (inc i)) "Select a Role (Optional)" false))))})))
 
 (defn get-desired-roles [event] 
-  (let [mode (-> event (.getOptionsByType OptionType/STRING) first .getAsString)
+  (let [mode (.. event getSubcommandName)
         selected-roles (map #(.getAsRole %) (.. event (getOptionsByType OptionType/ROLE)))
         legal-roles (reverse (filter #(and (not (.isManaged %))
                                            (not (.isPublicRole %))
@@ -68,7 +72,9 @@
         member (.. event (getMember)) ;; workaround to make things cleaner
         missing-permission? (if member 
                               (not (.. member (hasPermission [Permission/MANAGE_ROLES]))) 
-                              true)]
+                              true)
+        message (or (.. event (getOption "message") getAsString) 
+                    "Sign up for roles here!")]
     
     (cond 
       in-dm? 
@@ -101,10 +107,11 @@
           
           :else
           (.. event
-              (reply "Sign up for roles here!")
+              (reply message)
               (addActionRows (for [part partitions]
                                (ActionRow/of
                                 (for [role part] 
                                   (Button/secondary (str "role-signup " (.. role getId))
                                                     (str \@ (.. role getName)))))))
               (queue)))))))
+
