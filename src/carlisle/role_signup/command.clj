@@ -113,6 +113,5 @@
                                (ActionRow/of
                                 (for [role part] 
                                   (Button/secondary (str "role-signup " (.. role getId))
-                                                    (str \@ (.. role getName)))))))
+                                                    (.. role getName))))))
               (queue)))))))
-
