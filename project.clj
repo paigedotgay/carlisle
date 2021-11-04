@@ -4,7 +4,7 @@
   :license {:name "MIT"
             :url "https://opensource.org/licenses/MIT"}
   :dependencies [[camel-snake-kebab "0.4.2"]
-                 [net.dv8tion/JDA "4.3.0_331"]
+                 [net.dv8tion/JDA "4.3.0_339"]
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/core.async "1.3.618"]
                  [org.clojure/data.json "2.4.0"]
