@@ -26,27 +26,33 @@
 
 (defn build-info-embed [event]
   (let [bot (.. event getJDA)
+        commands (.. bot retrieveCommands complete)
+        name-desc-list (sort (for [command commands] 
+                                (format "**/%s:** %s," 
+                                        (.getName command)  
+                                        (.getDescription command))))  
         ping (.. bot getRestPing complete)
         largest (first (largest-duration (map-duration (get-millis))))
         duration (if (= 1 (val largest))
                    (str/join "" (drop-last (name (key largest))))
                    (name (key largest)))]
-    (-> (build-basic-embed event)
-        (.setThumbnail (.. bot getSelfUser getAvatarUrl))
-        (.addField "Guilds:" (str (count (.. bot getGuilds))) true)
-        (.addField "Users:" (str (count (.. bot getUsers))) true)
-        (.addField "Ping:" (format "%dms" ping) true)
-        (.addField "Bot Uptime:" 
+    (.. (build-basic-embed event)
+        (setThumbnail (.. bot getSelfUser getAvatarUrl))
+        (addField "Guilds:" (str (count (.. bot getGuilds))) true)
+        (addField "Users:" (str (count (.. bot getUsers))) true)
+        (addField "Ping:" (format "%dms" ping) true)
+        (addField "Bot Uptime:" 
                      (str (val largest) \space duration)
                    true)
-        (.addField "Server Uptime" 
+        (addField "Server Uptime" 
                    (-> (sh "uptime" "-p")
                        (:out)
                        (str/split #"( |,|\n)")
                        (rest)
                        (#(str (first  %) \space (second %))))
                    true)
-        .build)))
+        (addField (str (count commands) " Commands") (str/join "\n" name-desc-list) false)
+        build)))
 
 (def info-command-data
   (.. (CommandData. "info" "Get useful bot data")
