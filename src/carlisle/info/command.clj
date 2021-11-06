@@ -131,7 +131,7 @@
 (def info-command-data
     (.. (CommandData. "info" "Get useful data")
         (addSubcommandGroups #{(.. (SubcommandGroupData. "about" "select a target")
-                                   (addSubcommands (->> #{(SubcommandData. "bot" (str "info about " (.. app-info getName)))
+                                   (addSubcommands (->> #{(SubcommandData. "bot" "info about this bot")
                                                          (SubcommandData. "guild" "info about this guild")
                                                          (.. (SubcommandData. "user" "info about a user")
                                                              (addOption OptionType/USER 

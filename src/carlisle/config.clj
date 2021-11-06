@@ -3,7 +3,7 @@
   (:require [clojure.data.json :as json] 
             [clojure.tools.logging :as log]))
 
-(def app-info (atom nil))
+(def app-info nil)
 
 (def config (try
               (log/info "Loading config...")
