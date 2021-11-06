@@ -1,6 +1,6 @@
 (ns carlisle.repl.command
   (:gen-class)
-  (:use [carlisle.config :only [config]] 
+  (:use [carlisle.config :only [app-info]]
         [carlisle.utils]
         [clojure.java.javadoc]
         [clojure.java.shell]
@@ -81,7 +81,8 @@
   "Ensures that an eval is intended, and it is sent by owner"
   [event]
   (let [msg (.. event getMessage)
-        ids #{(if (.. event (isFromType ChannelType/TEXT)) (.. event getGuild getBotRole getId))
+        ids #{(if (.. event (isFromType ChannelType/TEXT)) 
+                (.. event getGuild getBotRole getId))
               (.. event getJDA getSelfUser getId)}]
     
     (and
@@ -107,8 +108,8 @@
 
      ;; make sure message is sent by owner
      (=
-      (.. event getAuthor getId)
-      (config :owner)))))
+      (.. event getAuthor)
+      (.. app-info getOwner)))))
 
 (defn- eval-to-map [txt]
   (with-out-result-map 

@@ -15,4 +15,4 @@ pages:
 test-run:
   stage: deploy
   script:
-    - timeout 30s lein run
+    - lein run ci-cd-mode $TOKEN
