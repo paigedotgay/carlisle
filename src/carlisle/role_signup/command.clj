@@ -1,7 +1,6 @@
 (ns carlisle.role-signup.command
   (:gen-class)
-  (:use [carlisle.config :only [config]]
-        [carlisle.utils])
+  (:use [carlisle.utils])
   (:require [clojure.string :as str])
   (:import [net.dv8tion.jda.api EmbedBuilder Permission]
            [net.dv8tion.jda.api.entities ChannelType]

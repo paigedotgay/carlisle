@@ -1,6 +1,7 @@
 (ns carlisle.dead-by-daylight.command
   (:gen-class)
-  (:use [carlisle.config :only [config]])
+  (:use [carlisle.config :only [config]]
+        [carlisle.utils :only [make-basic-embed]])
   (:require [camel-snake-kebab.core :as csk]
             [clojure.data.json :as json])
   (:import [net.dv8tion.jda.api EmbedBuilder]
@@ -32,20 +33,19 @@
 ;;;;;;;;;;;;
 
 (defn build-perk-embed
-  [perk event]
-  (-> (EmbedBuilder.)
-      (.setTitle (perk :perk_name))
-      (.setDescription (perk :description))
-      (.setFooter "<3#3333 made this (◍•ᴗ•◍)" (.. event getJDA (getUserById (config :owner)) getAvatarUrl))
-      (.setThumbnail (perk :icon))
-      (.build)))
+  [perk]
+  (.. (make-basic-embed)
+      (setTitle (perk :perk_name))
+      (setDescription (perk :description))
+      (setThumbnail (perk :icon))
+      (build)))
 
 (defn build-perk-roulette-embeds
-  [perks event]
+  [perks]
   (for [perk (->> perks
                  (shuffle)
                  (take 4))] 
-    (build-perk-embed perk event)))
+    (build-perk-embed perk)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; actual command junk ;;
@@ -63,6 +63,6 @@
                 "survivor" sperks
                 "killer" kperks)]
     (.. event
-        (replyEmbeds (build-perk-roulette-embeds perks event))
+        (replyEmbeds (build-perk-roulette-embeds perks))
         (setEphemeral true)
         (queue))))

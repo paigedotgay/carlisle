@@ -1,7 +1,6 @@
 (ns carlisle.warframe.utils
   (:gen-class)
-  (:use [carlisle.config :only [config]]
-        [carlisle.utils]) 
+  (:use [carlisle.utils]) 
   (:require [camel-snake-kebab.core :as csk]
             [clojure.core.async :as async] 
             [clojure.data.json :as json]
@@ -17,25 +16,25 @@
 (defn void-trader-embed-inactive
   "Returns a set (of one) embed detailing Baro's status.
   a set is used because a collection is expected"
-  [event]
-  #{ (.. (build-basic-embed event)
-           (setTitle "The Void Trader isn't here...")
-           (setThumbnail baro-img)
-           (setDescription (str "he will arrive in " (-> @worldstate :void-trader :start-string)))
-           (build))})
+  []
+  #{ (.. (make-basic-embed)
+         (setTitle "The Void Trader isn't here...")
+         (setThumbnail baro-img)
+         (setDescription (str "he will arrive in " (-> @worldstate :void-trader :start-string)))
+         (build))})
 
 (defn void-trader-embed-active-template
-  [event]
+  []
   (let [inventory (-> @worldstate :void-trader :inventory)]
-    (-> (build-basic-embed event)
-        (.setTitle "The Void Trader is here!")
-        (.setThumbnail baro-img)
-        (.setDescription (str "he will leave in " (-> @worldstate :void-trader :end-string))))))
+    (.. (make-basic-embed)
+        (setTitle "The Void Trader is here!")
+        (setThumbnail baro-img)
+        (setDescription (str "he will leave in " (-> @worldstate :void-trader :end-string))))))
 
 (defn void-trader-embed-partition
   "Embeds may only hold 25 fields, so this builds a (up to) 25 field partition of the inventory"
   [event inventory-partition]
-  (let [embed (void-trader-embed-active-template event)
+  (let [embed (void-trader-embed-active-template)
         ducats-emote (.. event getJDA (getEmoteById 664151434765533206))
         credits-emote (.. event getJDA (getEmoteById  664574338342846464))]
     (doseq [item inventory-partition]
