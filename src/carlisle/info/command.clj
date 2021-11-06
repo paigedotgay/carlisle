@@ -93,15 +93,15 @@
         user (.. event (getOption "user") getAsUser)]
     (println [user member])
     (as-> (make-basic-embed) embed ;; I hate this I hate this I hate this I hate this
-      (.setAuthor embed (if member
+      (.setAuthor embed (if (and member (.. member getNickname))
                           (format "%s (%s)"
                                   (.. member getEffectiveName)
                                   (.. user getAsTag))
                           (.. user getAsTag))
-                  (str "https://discord.com/users/" (.. user getId))
+                  (.. user getAvatarUrl)
                   (.. user getAvatarUrl))
       
-      (.setThumbnail embed (if member
+      (.setImage embed (if member
                              (.. member getEffectiveAvatarUrl)
                              (.. user getAvatarUrl)))
       (.addField embed "id:" (.. user getId) false)
