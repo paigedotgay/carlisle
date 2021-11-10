@@ -9,7 +9,8 @@
               (constantly (.. event
                   getJDA
                   retrieveApplicationInfo
-                  complete))))))
+                  complete
+                  (setRequiredScopes #{"applications.commands"})))))))
 
 (def ready-listener-ci-cd 
   (proxy [ListenerAdapter] []
