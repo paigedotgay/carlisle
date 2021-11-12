@@ -1,6 +1,7 @@
 (ns carlisle.warframe.utils
   (:gen-class)
-  (:use [carlisle.utils]) 
+  (:use [carlisle.utils]
+        [carlisle.config]) 
   (:require [camel-snake-kebab.core :as csk]
             [clojure.core.async :as async] 
             [clojure.data.json :as json]
@@ -33,10 +34,10 @@
 
 (defn void-trader-embed-partition
   "Embeds may only hold 25 fields, so this builds a (up to) 25 field partition of the inventory"
-  [event inventory-partition]
+  [inventory-partition]
   (let [embed (void-trader-embed-active-template)
-        ducats-emote (.. event getJDA (getEmoteById 664151434765533206))
-        credits-emote (.. event getJDA (getEmoteById  664574338342846464))]
+        ducats-emote (.. app-info getJDA (getEmoteById 664151434765533206))
+        credits-emote (.. app-info getJDA (getEmoteById  664574338342846464))]
     (doseq [item inventory-partition]
       (.. embed (addField (item :item) 
                           (format "%s%s %s%s" 
@@ -49,14 +50,14 @@
 
 (defn void-trader-full-inventory
   "builds as many embeds as will be needed to represent Baro's inventory, returning a set"
-  [event]
+  []
   (set (for [part (partition-all 25 (-> @worldstate :void-trader :inventory))]
-         (void-trader-embed-partition event part))))
+         (void-trader-embed-partition part))))
 
 (defn build-void-trader-embeds [event]
   (if (-> @worldstate :void-trader :active)
-    (void-trader-full-inventory event)
-    (void-trader-embed-inactive event)))
+    (void-trader-full-inventory)
+    (void-trader-embed-inactive)))
 
 (defn start-api-updates []
   (async/go-loop []
