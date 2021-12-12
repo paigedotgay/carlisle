@@ -42,7 +42,7 @@
   (if (and total 
            (or plus minus (> dice 1)))
     (format "%s%nTotal: %s" (clojure.string/join ", " rolls) (reduce + rolls)) 
-    (str (apply str rolls)))))
+    (clojure.string/join ", " rolls))))
 
 (defn roll-command [event]
   (let [dice (if-let [x (.. event (getOption "number-of-dice"))] 
