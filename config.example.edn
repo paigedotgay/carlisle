@@ -1,0 +1,16 @@
+{:token "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+ ;; I use a seperate bot for testing.
+ :dev-token "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+ :wolfram-token "xxxxxxxxxxxxxxxxx"
+
+ ;; I have two seperate invites
+ ;; one for a custom link
+ :server-invite-link "https://server.your-bot.com"
+ 
+ ;; and one for the default discord code, which works better in buttons
+ :server-invite-code "qJMZEBzdhm"
+ :repo "https://repo.your-bot.com"
+ 
+ ;; any custom emotes you use frequently
+ :emotes {:smiley-face 123456789123456789
+          :angry-face 123456789123456789}

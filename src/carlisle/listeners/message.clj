@@ -2,15 +2,15 @@
   (:gen-class)
   (:use [carlisle.config :only [config]] 
         [carlisle.logging :only [log-message]]
-        [carlisle.ask.command]
-        [carlisle.dead-by-daylight.command]
-        [carlisle.info.command]
-        [carlisle.mtg.command]
-        [carlisle.repl.command]
-        [carlisle.role-signup.command]
-        [carlisle.roll.command]
-        [carlisle.utils]
-        [carlisle.warframe.command])
+        [carlisle.commands.ask]
+        [carlisle.commands.dead-by-daylight]
+        [carlisle.commands.info]
+        [carlisle.commands.mtg]
+        [carlisle.commands.repl]
+        [carlisle.commands.role-signup]
+        [carlisle.commands.roll]
+        [carlisle.commands.warframe]
+        [carlisle.utils])
   (:import [net.dv8tion.jda.api.events.message MessageReceivedEvent]
            [net.dv8tion.jda.api.hooks ListenerAdapter]
            [net.dv8tion.jda.api.interactions.components Button])
@@ -44,7 +44,9 @@
               (.. event
                   (reply (format "Something went wrong!%nClick one of the links below, describe what you were trying to do, and provide this error code: `%s`"
                                  (.getMessage e)))
-                  (addActionRow #{(Button/link (config :server-invite) "Join the support server")
-                                  (Button/link (str (config :repo) "/issues/new") "Leave an issue on GitLab")})
+                  (addActionRow #{(Button/link (str "https://discord.com/invite/" (config :server-invite)) 
+                                               "Join the support server")
+                                  (Button/link (str (config :repo) "/issues/new") 
+                                               "Leave an issue on GitLab")})
                   (setEphemeral true)
                   (queue)))))))

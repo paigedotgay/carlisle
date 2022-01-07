@@ -1,9 +1,9 @@
 (ns carlisle.core
   (:gen-class)
-  (:use [carlisle.config :only [config]] 
+  (:use [carlisle.commands.role-signup :only [role-signup-button-listener]]
+        [carlisle.config :only [config]] 
         [carlisle.listeners.message]
-        [carlisle.listeners.ready]
-        [carlisle.role-signup.command :only [role-signup-button-listener]])
+        [carlisle.listeners.ready])
   (:import [net.dv8tion.jda.api JDABuilder Permission]
            [net.dv8tion.jda.api.requests GatewayIntent]
            [net.dv8tion.jda.api.utils.cache CacheFlag]

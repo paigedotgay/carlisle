@@ -1,4 +1,4 @@
-(ns carlisle.roll.command
+(ns carlisle.commands.roll
   (:import [net.dv8tion.jda.api.interactions.commands OptionType]
            [net.dv8tion.jda.api.interactions.commands.build CommandData]))
 
@@ -6,24 +6,27 @@
   (.. (CommandData. "roll" "roll some dice!")
       (addOption OptionType/INTEGER 
                  "number-of-dice" 
-                 "The number of dice you want to roll, defaults to 1." 
+                 "Default: 1. The number of dice you want to roll." 
                  false)
       (addOption OptionType/INTEGER 
                  "sides-per-dice" 
-                 "The number of sides on each dice you want to roll, defaults to 20." 
+                 "Default: 20. The number of sides on each dice you want to roll." 
                  false)
       (addOption OptionType/BOOLEAN 
                  "total-all-dice" 
-                 "Whether you want the total included with your roll, defaults to true" 
+                 "Default: True. Whether you want the total included with your roll." 
                  false)
       (addOption OptionType/INTEGER 
                  "plus" 
-                 "A flat bonus you want to add to your roll, defaults to 0" 
+                 "Default: 0. A flat bonus you want to add to your roll." 
                  false)
       (addOption OptionType/INTEGER 
                  "minus" 
-                 "A flat debuff you want to subtract from your roll, defaults to 0" 
-                 false)))
+                 "Default: 0. A flat debuff you want to subtract from your roll." 
+                 false)
+      (addOption OptionType/BOOLEAN
+                 "show-everyone"
+                 "Default: True.")))
 
 (defn roll
   [& {:keys [dice sides total plus minus] 
@@ -59,6 +62,12 @@
                nil)
         minus (if-let [x (.. event (getOption "minus"))]
                 (.getAsLong x)
-                nil)]
-    (.. event (reply (roll :dice dice :sides sides :total total :plus plus :minus minus)) complete)))
+                nil)
+        ephemeral? (if-some [option (.. event (getOption "show-everyone"))]
+                     (not (.. option getAsBoolean))
+                     false)]
+    (.. event 
+        (reply (roll :dice dice :sides sides :total total :plus plus :minus minus)) 
+        (setEphemeral ephemeral?)
+        complete)))
     

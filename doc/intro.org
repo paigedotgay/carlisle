@@ -1,0 +1,8 @@
+* Commands
+** /ask
+** /dead-by-daylight
+** /info
+** /mtg
+** /role-signup
+** /roll
+** /warframe

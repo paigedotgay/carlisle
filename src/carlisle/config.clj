@@ -7,7 +7,7 @@
 
 (def config (try
               (log/info "Loading config...")
-              (json/read-str (slurp "./config.json") :key-fn keyword)
+              (clojure.edn/read-string (slurp "./config.edn"))
               (catch Exception e 
                 (log/warn "Couln't load config! (I hope we're in CI/CD)")
                 {})))
