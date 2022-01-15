@@ -44,7 +44,7 @@
   "builds as many embeds as will be needed to represent Baro's inventory, returning a set"
   [worldstate]
   (set (for [part (partition-all 25 (-> worldstate :void-trader :inventory))]
-         (void-trader-embed-partition part))))
+         (void-trader-embed-partition part worldstate))))
 
 (defn build-void-trader-embeds [event worldstate]
   (if (-> worldstate :void-trader :active)

@@ -45,15 +45,18 @@
   "Moves a message by placing its content in an embed, and attaching its embeds and files.
   If there are already 10 embeds in the message the new embed will be sent first and the rest will follow."
   [event message message-author event-author target-channel mode]
-  (let [embeds (.getEmbeds message)
+  (let [copy? (= "copy" mode)
+        embeds (.getEmbeds message)
         files (.. message getAttachments)
         op-content (.. message getContentRaw)
         main-embed (as-> (carlisle.utils.basic/make-basic-embed) embed
                      (.setTitle embed 
                                 (str "Moved here by " (.. event-author getEffectiveName)))
                      (.setAuthor embed 
-                                 (str "OP: " (.. message-author getEffectiveName) ", click here for original message")
-                                 (.. message getJumpUrl)
+                                 (str "OP: " (.. message-author getEffectiveName) 
+                                      (when copy?
+                                        ", click here for original message"))
+                                 (when copy? (.. message getJumpUrl))
                                  (.. message-author getEffectiveAvatarUrl))
                      (if op-content
                        (.setDescription embed op-content)
@@ -87,7 +90,7 @@
               (add-all-files files)
               .complete))
           
-    (when (= mode "cut")
+    (when-not copy?
       (.. message delete complete))
   
     (.. event getHook (editOriginal "Success!") complete)))
