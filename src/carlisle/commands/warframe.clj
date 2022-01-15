@@ -15,14 +15,16 @@
                    
                    (OptionData. OptionType/BOOLEAN 
                                 "show-everyone" 
-                                "Default: False.")])))
+                                "Default: Varies.")])))
       
 (defn warframe-command 
   [event]
   (let [query (.. event (getOption "query") getAsString)
         ephemeral? (if-some [option (.. event (getOption "show-everyone"))]
                      (not (.. option getAsBoolean))
-                     true)]
+                     (case query
+                       "void-trader" (not (-> @worldstate :void-trader :active))
+                         true))]
 
     (.. event 
         (replyEmbeds (build-void-trader-embeds event @worldstate))
