@@ -4,7 +4,7 @@
            [net.dv8tion.jda.api.interactions.commands.build CommandData OptionData]
            [net.dv8tion.jda.api.utils AttachmentOption]))
 
-(def move-command-data
+(def move-command-data 
   (.. (CommandData. "move" "Move a message from one channel to another")
       (addOptions [(OptionData. OptionType/STRING
                                 "message-id"
@@ -23,11 +23,11 @@
                                       
 (defn add-all-files
   [message files]
-  (let [tmp-dir ;; Gets the path of /tmp or the windows equivalent, adds a / to the end if there isn't one.
-        (as-> (System/getProperty "java.io.tmpdir") path
-          (if (= \\ (last path))
-            path
-            (str path \/)))] 
+  ;; Gets the path of /tmp or the windows equivalent, adds a / to the end if there isn't one.
+  (let [tmp-dir (as-> (System/getProperty "java.io.tmpdir") path
+                  (case (last path)
+                    (\\ \/) path
+                    (str path \/)))] 
     (loop [message message
            files files]
         (if (zero? (count files))
@@ -58,9 +58,7 @@
                                         ", click here for original message"))
                                  (when copy? (.. message getJumpUrl))
                                  (.. message-author getEffectiveAvatarUrl))
-                     (if op-content
-                       (.setDescription embed op-content)
-                       embed)
+                     (.setDescription embed op-content)
                      (if (not-empty embeds)
                        (.addField embed 
                                   (str "Embeds: " (count embeds))  
@@ -74,56 +72,60 @@
                                   true)
                        embed)
                      (.build embed))
-        all-embeds (cons main-embed embeds)]
-    
-    (if (> (count all-embeds) 10)
-      (do (-> target-channel
-              (.sendMessageEmbeds [(first all-embeds)])
-              (add-all-files files)
-              .complete)
-          (-> target-channel
-              (.sendMessageEmbeds (rest all-embeds))
-              (add-all-files files)
-              .complete))
-      (-> target-channel
-              (.sendMessageEmbeds all-embeds)
-              (add-all-files files)
-              .complete))
+        all-embeds (cons main-embed embeds)
+        sent-msg (if (> (count all-embeds) 10)
+                   (do (-> target-channel
+                           (.sendMessageEmbeds [(first all-embeds)])
+                           (add-all-files files)
+                           .complete)
+                       (-> target-channel
+                           (.sendMessageEmbeds (rest all-embeds))
+                           (add-all-files files)
+                           .complete))
+                   (-> target-channel
+                       (.sendMessageEmbeds all-embeds)
+                       (add-all-files files)
+                       .complete))]
           
     (when-not copy?
       (.. message delete complete))
   
-    (.. event getHook (editOriginal "Success!") complete)))
+    (.. event 
+        getHook 
+        (editOriginal (format "Success!, click [here](%s) to jump to the new message."
+                      (.. sent-msg getJumpUrl)))
+        complete)))
 
 (defn move-command [event]
   (let [event-author (.. event getMember)
         message-id (.. event (getOption "message-id") getAsLong)
-        message (.. event getChannel (retrieveMessageById message-id) complete)
+        message (try (.. event getChannel (retrieveMessageById message-id) complete)
+                     (catch Exception e nil)) 
         message-author (when message
-                 (.. event getGuild (retrieveMember (.getAuthor message)) complete))
+                         (.. event getGuild (retrieveMember (.getAuthor message)) complete))
         target-channel (.. event (getOption "target-channel") getAsGuildChannel)
         mode (if-let [x (.. event (getOption "mode"))]
                (.getAsString x)
                "copy")
-        files-ok? (empty? (filter #(> (.getSize %) 8388608) (.getAttachments message)))
+        files-ok? (when message
+                    (empty? (filter #(> (.getSize %) 8388608) (.getAttachments message))))
         can-delete? (or (= "copy" mode)
                         (= message-author event-author)
                         (.. event-author
                             (hasPermission (.. event getChannel) [Permission/MESSAGE_READ Permission/MESSAGE_MANAGE])))
         can-send? (.. event-author
                       (hasPermission target-channel [Permission/MESSAGE_WRITE]))
-        reply-msg (cond
+        error-msg (cond
                     (not can-delete?) "You can't delete that message!"
                     (not can-send?) "You can't send messages in that channel!"
                     (nil? message) (str "The message with id `" message-id "` was not found in this channel!\nRemember you need to use this command in the channel that has the original message")
-                    (not files-ok?) "One of the attached files is too big for me to send!"
-                    :else "Success!")]
+                    (not files-ok?) "One of the attached files is too big for me to send!")]
     (.. event (deferReply true) complete)
     
-    (if (= "Success!" reply-msg)
-      (move event message message-author event-author target-channel mode)    
+    (if error-msg
       (.. event
           getHook
-          (editOriginal reply-msg)
-          complete))))
+          (editOriginal error-msg)
+          complete)
+      (move event message message-author event-author target-channel mode))))
 
