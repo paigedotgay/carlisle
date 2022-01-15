@@ -5,6 +5,7 @@
         [carlisle.commands.ask]
         [carlisle.commands.dead-by-daylight]
         [carlisle.commands.info]
+        [carlisle.commands.move]
         [carlisle.commands.mtg]
         [carlisle.commands.repl]
         [carlisle.commands.role-signup]
@@ -35,10 +36,11 @@
               "ask"              (ask-command event)
               "dead-by-daylight" (dead-by-daylight-command event)
               "info"             (info-command event)
+              "move"             (move-command event)
               "mtg"              (mtg-command event)
-              "warframe"         (warframe-command event)
               "role-signup"      (role-signup-command event)
-              "roll"             (roll-command event))
+              "roll"             (roll-command event)
+              "warframe"         (warframe-command event))
           
             (catch Exception e  
               (.. event
