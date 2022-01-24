@@ -1,4 +1,5 @@
 (ns carlisle.commands.move
+  (:use [carlisle.config :only [app-info]])
   (:import [net.dv8tion.jda.api Permission]
            [net.dv8tion.jda.api.interactions.commands OptionType]
            [net.dv8tion.jda.api.interactions.commands.build CommandData OptionData]
@@ -43,12 +44,18 @@
 
 (defn move
   "Moves a message by placing its content in an embed, and attaching its embeds and files.
-  If there are already 10 embeds in the message the new embed will be sent first and the rest will follow."
+  If there are already 10 embeds in the message the new embed will be sent first and the rest will follow.
+  Additionally, some caution has been taken to prevent users from being able to send possibly malicious
+  hyperlinks. The bot owner may, however, hyperlink messages."
   [event message message-author event-author target-channel mode]
   (let [copy? (= "copy" mode)
         embeds (.getEmbeds message)
         files (.. message getAttachments)
-        op-content (.. message getContentRaw)
+        op-content (if (= (.. app-info getOwner)
+                          (.. event-author getUser)
+                          (.. message-author getUser))
+                     (.. message getContentRaw)  
+                     (clojure.string/replace (.. message getContentRaw) #"]\(" "]\u200b("))
         main-embed (as-> (carlisle.utils.basic/make-basic-embed) embed
                      (.setTitle embed 
                                 (str "Moved here by " (.. event-author getEffectiveName)))
