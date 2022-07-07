@@ -4,14 +4,14 @@
   (:require [clojure.string :as str])
   (:import [net.dv8tion.jda.api EmbedBuilder Permission]
            [net.dv8tion.jda.api.entities ChannelType]
-           [net.dv8tion.jda.api.events.interaction SelectionMenuEvent]
            [net.dv8tion.jda.api.hooks ListenerAdapter]
            [net.dv8tion.jda.api.interactions.commands OptionType Command]
-           [net.dv8tion.jda.api.interactions.commands.build CommandData OptionData SubcommandData]
-           [net.dv8tion.jda.api.interactions.components ActionRow Button]))
+           [net.dv8tion.jda.api.interactions.commands.build Commands OptionData SubcommandData]
+           [net.dv8tion.jda.api.interactions.components ActionRow]
+           [net.dv8tion.jda.api.interactions.components.buttons Button]))
 
 (def role-signup-command-data
-  (.. (CommandData. "role-signup" "Set up a way for users to enrole themselves.")
+  (.. (Commands/slash "role-signup" "Set up a way for users to enrole themselves.")
       (addSubcommands #{(.. (SubcommandData. "selection-mode" "Create Buttons For Only Selected Roles (below your maximum role) (recommended)")
                             (addOption OptionType/STRING "message" "What would you like the message attactched to the buttons to say?")
                             (addOptions (for [i (range 24)] (OptionData. OptionType/ROLE (str "role-" (inc i)) "Select a Role (Optional)" false))))

@@ -4,10 +4,9 @@
   (:require [camel-snake-kebab.core :as csk]
             [clojure.data.json :as json])
   (:import [net.dv8tion.jda.api EmbedBuilder]
-           [net.dv8tion.jda.api.events.interaction SelectionMenuEvent]
-           [net.dv8tion.jda.api.interactions.commands OptionType Command]
-           [net.dv8tion.jda.api.interactions.commands.build CommandData OptionData]
-           [net.dv8tion.jda.api.interactions.components.selections SelectionMenu]))
+           [net.dv8tion.jda.api.interactions.commands Command OptionType]
+           [net.dv8tion.jda.api.interactions.commands.build Commands OptionData]))
+ 
 
 ;;;;;;;;;;;
 ;; perks ;;
@@ -51,7 +50,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def dead-by-daylight-command-data
-  (.. (CommandData. "dead-by-daylight" "Various commands related to Dead by Daylight")
+  (.. (Commands/slash "dead-by-daylight" "Various commands related to Dead by Daylight")
       (addOptions [(.. (OptionData. OptionType/STRING "role" "Who are you playing as?" true)
                        (addChoice "killer" "killer")
                        (addChoice "survivor" "survivor"))

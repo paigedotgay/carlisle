@@ -3,12 +3,12 @@
   (:use [carlisle.config]
         [carlisle.utils.basic]
         [clojure.java.shell :only [sh]])
-  (:require
-        [clojure.string :as str])
+  (:require [clojure.tools.logging :as log]
+            [clojure.string :as str])
   (:import [net.dv8tion.jda.api EmbedBuilder Permission]
            [net.dv8tion.jda.api.interactions.commands OptionType Command]
-           [net.dv8tion.jda.api.interactions.commands.build CommandData OptionData SubcommandData SubcommandGroupData]
-           [net.dv8tion.jda.api.interactions.components Button]))
+           [net.dv8tion.jda.api.interactions.commands.build Commands OptionData SubcommandData SubcommandGroupData]
+           [net.dv8tion.jda.api.interactions.components.buttons Button]))
 
 (defn get-millis []
   (.getUptime (java.lang.management.ManagementFactory/getRuntimeMXBean)))
@@ -88,48 +88,87 @@
         (build))))
   
 
-(defn build-user-info-embed [event]
-  (let [member (.. event (getOption "user") getAsMember)
-        user (.. event (getOption "user") getAsUser)]
-    (println [user member])
-    (as-> (make-basic-embed) embed ;; I hate this I hate this I hate this I hate this
-      (.setAuthor embed (if (and member (.. member getNickname))
-                          (format "%s (%s)"
-                                  (.. member getEffectiveName)
-                                  (.. user getAsTag))
-                          (.. user getAsTag))
-                  (.. user getAvatarUrl)
-                  (.. user getAvatarUrl))
-      
-      (.setImage embed (if member
-                             (.. member getEffectiveAvatarUrl)
-                             (.. user getAvatarUrl)))
-      (.addField embed "id:" (.. user getId) false)
-      (.addField embed "Account Created:"
-                 (let [[year month day] 
-                       (clojure.instant/parse-timestamp vector (.. user getTimeCreated toString))]
-                   
-                   (format "%s %d, %d"
-                           (-> (java.time.Month/of month) str/capitalize)
-                           day year))
-                 true)
-      (if member
-        (do (.addField embed "Joined Guild:"
-                       (let [[year month day] 
-                             (clojure.instant/parse-timestamp vector (.. member getTimeJoined toString))]
-                         
-                         (format "%s %d, %d"
-                                 (-> (java.time.Month/of month) str/capitalize)
-                                 day year))
-                       true)
-            (.addField embed (str "Roles: " (count (.. member getRoles)))
-                       (trunc (str/join ", " (map #(.getName %) (.. member getRoles))) 1024)
-                       false))
-        embed)
-      (.build embed))))
+(defn build-user-info-embed 
+  ([event member]
+   (log/info "Triggered buie w/ member")
+   (let [user (.. member getUser)]
+     (as-> (make-basic-embed) embed ;; I hate this I hate this I hate this I hate this
+       (.setAuthor embed (if (and member (.. member getNickname))
+                           (format "%s (%s)"
+                                   (.. member getEffectiveName)
+                                   (.. user getAsTag))
+                           (.. user getAsTag))
+                   (.. user getAvatarUrl)
+                   (.. user getAvatarUrl))
+       
+       (.setImage embed (if member
+                          (.. member getEffectiveAvatarUrl)
+                          (.. user getAvatarUrl)))
+       (.addField embed "id:" (.. user getId) false)
+       (.addField embed "Account Created:"
+                  (let [[year month day] 
+                        (clojure.instant/parse-timestamp vector (.. user getTimeCreated toString))]
+                    
+                    (format "%s %d, %d"
+                            (-> (java.time.Month/of month) str/capitalize)
+                            day year))
+                  true)
+       (if member
+         (do (.addField embed "Joined Guild:"
+                        (let [[year month day] 
+                              (clojure.instant/parse-timestamp vector (.. member getTimeJoined toString))]
+                          
+                          (format "%s %d, %d"
+                                  (-> (java.time.Month/of month) str/capitalize)
+                                  day year))
+                        true)
+             (.addField embed (str "Roles: " (count (.. member getRoles)))
+                        (trunc (str/join ", " (map #(.getName %) (.. member getRoles))) 1024)
+                        false))
+         embed)
+       (.build embed))))
+  
+  ([event]
+   (let [member (.. event (getOption "user") getAsMember)
+         user (.. event (getOption "user") getAsUser)]
+     (as-> (make-basic-embed) embed ;; I hate this I hate this I hate this I hate this
+       (.setAuthor embed (if (and member (.. member getNickname))
+                           (format "%s (%s)"
+                                   (.. member getEffectiveName)
+                                   (.. user getAsTag))
+                           (.. user getAsTag))
+                   (.. user getAvatarUrl)
+                   (.. user getAvatarUrl))
+       
+       (.setImage embed (if member
+                          (.. member getEffectiveAvatarUrl)
+                          (.. user getAvatarUrl)))
+       (.addField embed "id:" (.. user getId) false)
+       (.addField embed "Account Created:"
+                  (let [[year month day] 
+                        (clojure.instant/parse-timestamp vector (.. user getTimeCreated toString))]
+                    
+                    (format "%s %d, %d"
+                            (-> (java.time.Month/of month) str/capitalize)
+                            day year))
+                  true)
+       (if member
+         (do (.addField embed "Joined Guild:"
+                        (let [[year month day] 
+                              (clojure.instant/parse-timestamp vector (.. member getTimeJoined toString))]
+                          
+                          (format "%s %d, %d"
+                                  (-> (java.time.Month/of month) str/capitalize)
+                                  day year))
+                        true)
+             (.addField embed (str "Roles: " (count (.. member getRoles)))
+                        (trunc (str/join ", " (map #(.getName %) (.. member getRoles))) 1024)
+                        false))
+         embed)
+       (.build embed)))))
 
 (def info-command-data
-    (.. (CommandData. "info" "Get useful data")
+    (.. (Commands/slash "info" "Get useful data")
         (addSubcommandGroups #{(.. (SubcommandGroupData. "about" "select a target")
                                    (addSubcommands (->> #{(SubcommandData. "bot" "Get info about this bot.")
                                                          (SubcommandData. "guild" "Get info about this guild.")
@@ -144,25 +183,31 @@
   
 (defn info-command 
   [event]
-  (let [ephemeral? (if-some [option (.. event (getOption "show-everyone"))]
-                     (not (.. option getAsBoolean))
-                     true)
-        build-embed (case (.. event getSubcommandName)
-                      "bot"   build-bot-info-embed
-                      "guild" build-guild-info-embed
-                      "user"  build-user-info-embed
-                      (throw (Exception. (format "subcommand %s not found"))))
-        response (.. event
-                     (replyEmbeds #{(build-embed event)})
-                     (setEphemeral ephemeral?))]
-    
-    (.. (if (= (.. event getSubcommandName) "bot")
-          (.. response
-              (addActionRow #{(Button/link (str "https://discord.com/invite/" (config :server-invite-code))
-                                           "Join the Support Server")
-                              (Button/link (config :repo) 
-                                           "View the Source Code")})
-              (addActionRow #{(Button/link (.. app-info (getInviteUrl #{Permission/ADMINISTRATOR})) 
-                                           "Invite Carlisle to Your Server")}))
-          response)
-        complete)))
+  (log/info (.. event getType))
+  (if (= (.. event getCommandType) net.dv8tion.jda.api.interactions.commands.Command$Type/USER)
+    (.. event 
+        (replyEmbeds [(build-user-info-embed event (.. event getTargetMember))])
+        (setEphemeral true)
+        (complete))
+    (let [ephemeral? (if-some [option (.. event (getOption "show-everyone"))]
+                       (not (.. option getAsBoolean))
+                       true)
+          build-embed (case (.. event getSubcommandName)
+                        "bot"   build-bot-info-embed
+                        "guild" build-guild-info-embed
+                        "user"  build-user-info-embed
+                        (throw (Exception. (format "subcommand %s not found"))))
+          response (.. event
+                       (replyEmbeds #{(build-embed event)})
+                       (setEphemeral ephemeral?))]
+      
+      (.. (if (= (.. event getSubcommandName) "bot")
+            (.. response
+                (addActionRow #{(Button/link (str "https://discord.com/invite/" (config :server-invite-code))
+                                             "Join the Support Server")
+                                (Button/link (config :repo) 
+                                             "View the Source Code")})
+                (addActionRow #{(Button/link (.. app-info (getInviteUrl #{Permission/ADMINISTRATOR})) 
+                                             "Invite Carlisle to Your Server")}))
+            response)
+          complete))))

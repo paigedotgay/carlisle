@@ -6,7 +6,7 @@
   (:require [clojure.string :as str]
             [clojure.data.json :as json])
   (:import  [net.dv8tion.jda.api.interactions.commands OptionType Command]
-            [net.dv8tion.jda.api.interactions.commands.build CommandData OptionData]))
+            [net.dv8tion.jda.api.interactions.commands.build Commands OptionData]))
 
 
 (defn mtg [card]
@@ -20,7 +20,7 @@
       :large))
 
 (def mtg-command-data
-  (.. (CommandData. "mtg" "fetch cards")
+  (.. (Commands/slash "mtg" "fetch cards")
       (addOptions [(OptionData. OptionType/STRING
                                 "name"
                                 "Name of the card."

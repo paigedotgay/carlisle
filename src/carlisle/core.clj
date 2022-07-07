@@ -3,7 +3,8 @@
   (:use [carlisle.commands.role-signup :only [role-signup-button-listener]]
         [carlisle.config :only [config]] 
         [carlisle.listeners.message]
-        [carlisle.listeners.ready])
+        [carlisle.listeners.ready]
+        [carlisle.listeners.interaction])
   (:import [net.dv8tion.jda.api JDABuilder Permission]
            [net.dv8tion.jda.api.requests GatewayIntent]
            [net.dv8tion.jda.api.utils.cache CacheFlag]
@@ -31,7 +32,8 @@
            (setMemberCachePolicy MemberCachePolicy/ALL)
            (addEventListeners (object-array [message-listener 
                                              ready-listener
-                                             role-signup-button-listener]))
+                                             role-signup-button-listener
+                                             interaction-listener]))
            (build))))
 
 (defn build-ci-cd [token]

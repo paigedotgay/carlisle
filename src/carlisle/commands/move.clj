@@ -2,11 +2,11 @@
   (:use [carlisle.config :only [app-info]])
   (:import [net.dv8tion.jda.api Permission]
            [net.dv8tion.jda.api.interactions.commands OptionType]
-           [net.dv8tion.jda.api.interactions.commands.build CommandData OptionData]
+           [net.dv8tion.jda.api.interactions.commands.build Commands OptionData]
            [net.dv8tion.jda.api.utils AttachmentOption]))
 
 (def move-command-data 
-  (.. (CommandData. "move" "Move a message from one channel to another")
+  (.. (Commands/slash "move" "Move a message from one channel to another")
       (addOptions [(OptionData. OptionType/STRING
                                 "message-id"
                                 "To get the ID, right click or tap and hold on the message and select Copy ID"
@@ -119,9 +119,9 @@
         can-delete? (or (= "copy" mode)
                         (= message-author event-author)
                         (.. event-author
-                            (hasPermission (.. event getChannel) [Permission/MESSAGE_READ Permission/MESSAGE_MANAGE])))
+                            (hasPermission (.. event getChannel) [Permission/VIEW_CHANNEL Permission/MESSAGE_MANAGE])))
         can-send? (.. event-author
-                      (hasPermission target-channel [Permission/MESSAGE_WRITE]))
+                      (hasPermission target-channel [Permission/MESSAGE_SEND]))
         error-msg (cond
                     (not can-delete?) "You can't delete that message!"
                     (not can-send?) "You can't send messages in that channel!"

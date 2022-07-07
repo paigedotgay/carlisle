@@ -1,9 +1,9 @@
 (ns carlisle.commands.roll
   (:import [net.dv8tion.jda.api.interactions.commands OptionType]
-           [net.dv8tion.jda.api.interactions.commands.build CommandData]))
+           [net.dv8tion.jda.api.interactions.commands.build Commands]))
 
 (def roll-command-data
-  (.. (CommandData. "roll" "roll some dice!")
+  (.. (Commands/slash "roll" "roll some dice!")
       (addOption OptionType/INTEGER 
                  "number-of-dice" 
                  "Default: 1. The number of dice you want to roll." 
