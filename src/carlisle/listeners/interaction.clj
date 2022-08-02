@@ -17,6 +17,9 @@
            [net.dv8tion.jda.api.interactions.components.buttons Button])
   (:require [clojure.tools.logging :as log]))
 
+;; TODO: seperate interaction types out
+;; 
+
 (def interaction-listener
       (proxy [ListenerAdapter] []
       

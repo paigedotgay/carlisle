@@ -1,5 +1,5 @@
 (defproject carlisle "0.1.0-SNAPSHOT"
-  :description "A Clojure + Kotlin discord bot"
+  :description "A Clojure discord bot"
   :url "https://carlisle-bot.com"
   :license {:name "MIT"
             :url "https://opensource.org/licenses/MIT"}
