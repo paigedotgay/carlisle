@@ -24,7 +24,7 @@
       (proxy [ListenerAdapter] []
       
         (onGenericInteractionCreate [event]
-          (do (log/info (str "recieved command /" (.getName event) " from " (.. event getUser getAsTag)))
+          (do (log/info (str "recieved " (.getCommandType event) " command " (.getName event) " from " (.. event getUser getAsTag)))
               (try
                 (case (.getName event)
                   "ask"              (ask-command event)
@@ -37,12 +37,14 @@
                   "warframe"         (warframe-command event))
           
                 (catch Exception e  
+                  (println (.getStackTrace e))
                   (.. event
-                      (reply (format "Something went wrong!%nClick one of the links below, describe what you were trying to do, and provide this error code: `%s`"
+                      (reply (format "Something went wrong!%nClick one of the links below, describe what you were trying to do, and provide this error code: `%s%n%s`"
+                                     (.getCause e)
                                      (.getMessage e)))
                       (addActionRow #{(Button/link (str "https://discord.com/invite/" (config :server-invite)) 
                                                    "Join the support server")
                                       (Button/link (str (config :repo) "/issues/new") 
-                                                   "Leave an issue on GitLab")})
+                                                   "Leave an issue on GitHub")})
                       (setEphemeral true)
                       (queue))))))))
