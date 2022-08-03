@@ -5,6 +5,7 @@
            [net.dv8tion.jda.api.interactions.commands OptionType]
            [net.dv8tion.jda.api.interactions.commands.build Commands OptionData]
            [net.dv8tion.jda.api.interactions.components Modal]
+           [net.dv8tion.jda.api.interactions.components.selections SelectMenu SelectOption]
            [net.dv8tion.jda.api.interactions.components.text TextInput TextInputStyle]
            [net.dv8tion.jda.api.utils AttachmentOption]))
 
@@ -48,9 +49,24 @@
 (defn make-modal 
   "If an event doesn't have enough info, a modal can be made to gather more."
   [event]
-  (.. (Modal/create "modal-test-modal-more-info" "More info is required...")
-      (addActionRow #{ (.. (TextInput/create "body", "Body", TextInputStyle/SHORT) build) })
-      build))
+  (let [author (.. event getMember)
+        bot (.. event getGuild getSelfMember)
+        channels (.. event getGuild getTextChannels)
+        valid-channels (filter #((set (.. % getMembers)) author) channels)
+        selections (for [channel valid-channels]
+                     (SelectOption/of (str (.. channel getParentCategory getName) \/ \# (.getName channel)) (.getId channel)))]
+    (.. event
+        (reply "move where?")
+        (addActionRow #{(.. (SelectMenu/create "menu:select-channel")
+                            (setRequiredRange 1 1)
+                            (addOptions selections)
+                            build)})
+        complete)))
+                          
+  ;; (.. (Modal/create "modal-test-modal-more-info" "More info is required...")
+  ;;     (addActionRow #{(.. (TextInput/create "channel", "Channel to move to", TextInputStyle/SHORT) build)})
+  ;;     ( addActionRow #{(.. (TextInput/create "mode", "Copy or Cut", TextInputStyle/SHORT) build) })
+  ;;     build))
   
 
 (defn move
