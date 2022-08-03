@@ -87,9 +87,10 @@
     
     (and
      ;; make sure the bot is mentioned
-     (.. msg (isMentioned
-              (.. event getJDA getSelfUser)
-              (into-array Message$MentionType [Message$MentionType/USER Message$MentionType/ROLE])))
+     (.. msg getMentions
+         (isMentioned
+          (.. event getJDA getSelfUser)
+          (into-array Message$MentionType [Message$MentionType/USER Message$MentionType/ROLE])))
 
      ;; make sure the mention is at the start of the message
      (contains? ids

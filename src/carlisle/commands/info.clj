@@ -3,8 +3,7 @@
   (:use [carlisle.config]
         [carlisle.utils.basic]
         [clojure.java.shell :only [sh]])
-  (:require [clojure.tools.logging :as log]
-            [clojure.string :as str])
+  (:require [clojure.string :as str])
   (:import [net.dv8tion.jda.api EmbedBuilder Permission]
            [net.dv8tion.jda.api.interactions.commands OptionType Command]
            [net.dv8tion.jda.api.interactions.commands.build Commands OptionData SubcommandData SubcommandGroupData]
@@ -90,7 +89,6 @@
 
 (defn build-user-info-embed 
   ([event member]
-   (log/info "Triggered buie w/ member")
    (let [user (.. member getUser)]
      (as-> (make-basic-embed) embed ;; I hate this I hate this I hate this I hate this
        (.setAuthor embed (if (and member (.. member getNickname))
@@ -183,7 +181,6 @@
   
 (defn info-command 
   [event]
-  (log/info (.. event getType))
   (if (= (.. event getCommandType) net.dv8tion.jda.api.interactions.commands.Command$Type/USER)
     (.. event 
         (replyEmbeds [(build-user-info-embed event (.. event getTargetMember))])

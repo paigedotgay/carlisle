@@ -14,19 +14,20 @@
 
 (defn build-full [token]
   (let [cache   [CacheFlag/CLIENT_STATUS
-                 CacheFlag/EMOTE
+                 CacheFlag/EMOJI
                  CacheFlag/MEMBER_OVERRIDES
                  CacheFlag/ROLE_TAGS
                  CacheFlag/VOICE_STATE]
         intents [GatewayIntent/GUILD_MEMBERS
-                   GatewayIntent/GUILD_PRESENCES
-                   GatewayIntent/GUILD_BANS 
-                   GatewayIntent/GUILD_EMOJIS 
-                   GatewayIntent/GUILD_VOICE_STATES 
-                   GatewayIntent/GUILD_MESSAGES 
-                   GatewayIntent/GUILD_MESSAGE_REACTIONS 
-                   GatewayIntent/DIRECT_MESSAGES 
-                   GatewayIntent/DIRECT_MESSAGE_REACTIONS]]
+                 GatewayIntent/GUILD_PRESENCES
+                 GatewayIntent/GUILD_BANS 
+                 GatewayIntent/GUILD_EMOJIS_AND_STICKERS
+                 GatewayIntent/GUILD_VOICE_STATES 
+                 GatewayIntent/GUILD_MESSAGES 
+                 GatewayIntent/GUILD_MESSAGE_REACTIONS 
+                 GatewayIntent/DIRECT_MESSAGES 
+                 GatewayIntent/DIRECT_MESSAGE_REACTIONS
+                 GatewayIntent/MESSAGE_CONTENT]]
        (.. (JDABuilder/create token intents)
            (enableCache cache)
            (setMemberCachePolicy MemberCachePolicy/ALL)

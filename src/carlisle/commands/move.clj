@@ -1,11 +1,14 @@
 (ns carlisle.commands.move
   (:use [carlisle.config :only [app-info]])
   (:import [net.dv8tion.jda.api Permission]
+           [net.dv8tion.jda.api.interactions InteractionType]
            [net.dv8tion.jda.api.interactions.commands OptionType]
            [net.dv8tion.jda.api.interactions.commands.build Commands OptionData]
+           [net.dv8tion.jda.api.interactions.components Modal]
+           [net.dv8tion.jda.api.interactions.components.text TextInput TextInputStyle]
            [net.dv8tion.jda.api.utils AttachmentOption]))
 
-(def move-command-data 
+(def move-command-datas
   (.. (Commands/slash "move" "Move a message from one channel to another")
       (addOptions [(OptionData. OptionType/STRING
                                 "message-id"
@@ -41,6 +44,14 @@
                        (addFile dlfile
                                 (into-array AttachmentOption nil)))
                    (rest files)))))))
+
+(defn make-modal 
+  "If an event doesn't have enough info, a modal can be made to gather more."
+  [event]
+  (.. (Modal/create "modal-test-modal-more-info" "More info is required...")
+      (addActionRow #{ (.. (TextInput/create "body", "Body", TextInputStyle/SHORT) build) })
+      build))
+  
 
 (defn move
   "Moves a message by placing its content in an embed, and attaching its embeds and files.
@@ -103,36 +114,38 @@
                       (.. sent-msg getJumpUrl)))
         complete)))
 
-(defn move-command [event]
-  (let [event-author (.. event getMember)
-        message-id (.. event (getOption "message-id") getAsLong)
-        message (try (.. event getChannel (retrieveMessageById message-id) complete)
-                     (catch Exception e nil)) 
-        message-author (when message
-                         (.. event getGuild (retrieveMember (.getAuthor message)) complete))
-        target-channel (.. event (getOption "target-channel") getAsGuildChannel)
-        mode (if-let [x (.. event (getOption "mode"))]
-               (.getAsString x)
-               "copy")
-        files-ok? (when message
-                    (empty? (filter #(> (.getSize %) 8388608) (.getAttachments message))))
-        can-delete? (or (= "copy" mode)
-                        (= message-author event-author)
-                        (.. event-author
-                            (hasPermission (.. event getChannel) [Permission/VIEW_CHANNEL Permission/MESSAGE_MANAGE])))
-        can-send? (.. event-author
-                      (hasPermission target-channel [Permission/MESSAGE_SEND]))
-        error-msg (cond
-                    (not can-delete?) "You can't delete that message!"
-                    (not can-send?) "You can't send messages in that channel!"
-                    (nil? message) (str "The message with id `" message-id "` was not found in this channel!\nRemember you need to use this command in the channel that has the original message")
-                    (not files-ok?) "One of the attached files is too big for me to send!")]
-    (.. event (deferReply true) complete)
+(defn move-command 
+  [event]
+  (.. event (replyModal (make-modal event)) complete))
+  ;; (let [event-author (.. event getMember)
+  ;;       message-id (.. event (getOption "message-id") getAsLong)
+  ;;       message (try (.. event getChannel (retrieveMessageById message-id) complete)
+  ;;                    (catch Exception e nil)) 
+  ;;       message-author (when message
+  ;;                        (.. event getGuild (retrieveMember (.getAuthor message)) complete))
+  ;;       target-channel (.. event (getOption "target-channel") getAsGuildChannel)
+  ;;       mode (if-let [x (.. event (getOption "mode"))]
+  ;;              (.getAsString x)
+  ;;              "copy")
+  ;;       files-ok? (when message
+  ;;                   (empty? (filter #(> (.getSize %) 8388608) (.getAttachments message))))
+  ;;       can-delete? (or (= "copy" mode)
+  ;;                       (= message-author event-author)
+  ;;                       (.. event-author
+  ;;                           (hasPermission (.. event getChannel) [Permission/VIEW_CHANNEL Permission/MESSAGE_MANAGE])))
+  ;;       can-send? (.. event-author
+  ;;                     (hasPermission target-channel [Permission/MESSAGE_SEND]))
+  ;;       error-msg (cond
+  ;;                   (not can-delete?) "You can't delete that message!"
+  ;;                   (not can-send?) "You can't send messages in that channel!"
+  ;;                   (nil? message) (str "The message with id `" message-id "` was not found in this channel!\nRemember you need to use this command in the channel that has the original message")
+  ;;                   (not files-ok?) "One of the attached files is too big for me to send!")]
+  ;;   (.. event (deferReply true) complete)
     
-    (if error-msg
-      (.. event
-          getHook
-          (editOriginal error-msg)
-          complete)
-      (move event message message-author event-author target-channel mode))))
+  ;;   (if error-msg  
+  ;;     (.. event
+  ;;         getHook
+  ;;         (editOriginal error-msg)
+  ;;         complete)
+  ;;     (move event message message-author event-author target-channel mode))))
 
