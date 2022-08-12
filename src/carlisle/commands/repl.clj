@@ -144,7 +144,7 @@
   msg     - The Message object
   txt     - The message, minus the invoking mention
   guild   - The guild the command was sent in
-  *last*  - The result of the last evaluation"
+  *1, *2, *3  - The results of prior evaluations"
   [_event] 
   (binding [*ns* (find-ns 'carlisle.commands.repl)
             event _event
@@ -179,3 +179,15 @@
       (alter-var-root #'*2 (constantly *1))
       (alter-var-root #'*1 (constantly result)))))
        
+(defn refresh-my-memory 
+  "This is only a function because I'm used to parens at this point lmao."
+  []
+  "The following variables have been assigned for your convenience:
+  event      - The MessageReceivedEvent
+  bot        - The bot (User)
+  author     - You (User)
+  channel    - The MessageChannel the command was sent in
+  msg        - The Message object
+  txt        - The message, minus the invoking mention
+  guild      - The guild the command was sent in
+  *1, *2, *3 - The results of prior evaluations")
