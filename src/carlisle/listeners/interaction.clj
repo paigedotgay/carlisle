@@ -14,17 +14,19 @@
         [carlisle.utils])
   (:import [net.dv8tion.jda.api.events.message MessageReceivedEvent]
            [net.dv8tion.jda.api.hooks ListenerAdapter]
-           [net.dv8tion.jda.api.interactions.components.buttons Button])
+           [net.dv8tion.jda.api.interactions InteractionType]
+	   [net.dv8tion.jda.api.interactions.components.buttons Button])
   (:require [clojure.tools.logging :as log]))
 
 ;; TODO: seperate interaction types out
 ;; 
 
-(def interaction-listener
+(def command-listener
       (proxy [ListenerAdapter] []
       
-        (onGenericInteractionCreate [event]
+        (onSlashCommandInteraction [event]
           (do (log/info (str "recieved " (.getCommandType event) " command " (.getName event) " from " (.. event getUser getAsTag)))
+          
               (try
                 (case (.getName event)
                   "ask"              (ask-command event)
@@ -35,7 +37,7 @@
                   "role-signup"      (role-signup-command event)
                   "roll"             (roll-command event)
                   "warframe"         (warframe-command event))
-          
+            
                 (catch Exception e  
                   (println (.getStackTrace e))
                   (.. event

@@ -79,7 +79,7 @@
                       (format "Founded %s %d, %d"
                               (-> (java.time.Month/of month) str/capitalize)
                               day year))
-                    (str "**Custom Emotes:** " (count (.. guild getEmotes)))
+                    (str "**Custom Emoji:** " (count (.. guild getEmojis)))
                     true)
           build))
     (.. (make-basic-embed)

@@ -28,15 +28,15 @@
   "Embeds may only hold 25 fields, so this builds a (up to) 25 field partition of the inventory"
   [inventory-partition worldstate]
   (let [embed (void-trader-embed-active-template worldstate)
-        ducats-emote (.. app-info getJDA (getEmoteById (-> config :emotes :ducats)))
-        credits-emote (.. app-info getJDA (getEmoteById (-> config :emotes :credits)))]
+        ducats-emoji (.. app-info getJDA (getEmojiById (-> config :emoji :ducats)))
+        credits-emoji (.. app-info getJDA (getEmojiId (-> config :emoji :credits)))]
     (doseq [item inventory-partition]
       (.. embed (addField (item :item) 
                           (format "%s%s %s%s" 
                                   (item :ducats) 
-                                  ducats-emote
+                                  ducats-emoji
                                   (item :credits)
-                                  credits-emote)
+                                  credits-emoji)
                           true)))
       (.build embed)))
 

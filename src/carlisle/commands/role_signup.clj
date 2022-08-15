@@ -41,7 +41,7 @@
 (def role-signup-button-listener
   (proxy [ListenerAdapter] []
       
-    (onButtonClick [event]
+    (onButtonInteraction [event]
       (if (= "role-signup" (first (str/split (.. event getButton getId) #" ")))
         (let [guild (.. event getGuild)
               member (.. event getMember)

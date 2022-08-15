@@ -34,7 +34,7 @@
            (addEventListeners (object-array [message-listener 
                                              ready-listener
                                              role-signup-button-listener
-                                             interaction-listener]))
+                                             command-listener]))
            (build))))
 
 (defn build-ci-cd [token]
