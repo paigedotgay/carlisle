@@ -1,12 +1,16 @@
 (ns carlisle.commands.move
   (:use [carlisle.config :only [app-info]])
   (:import [net.dv8tion.jda.api Permission]
+           [net.dv8tion.jda.api.interactions InteractionType]
            [net.dv8tion.jda.api.interactions.commands OptionType]
-           [net.dv8tion.jda.api.interactions.commands.build CommandData OptionData]
+           [net.dv8tion.jda.api.interactions.commands.build Commands OptionData]
+           [net.dv8tion.jda.api.interactions.components Modal]
+           [net.dv8tion.jda.api.interactions.components.selections SelectMenu SelectOption]
+           [net.dv8tion.jda.api.interactions.components.text TextInput TextInputStyle]
            [net.dv8tion.jda.api.utils AttachmentOption]))
 
-(def move-command-data 
-  (.. (CommandData. "move" "Move a message from one channel to another")
+(def move-command-data
+  (.. (Commands/slash "move" "Move a message from one channel to another")
       (addOptions [(OptionData. OptionType/STRING
                                 "message-id"
                                 "To get the ID, right click or tap and hold on the message and select Copy ID"
@@ -41,6 +45,30 @@
                        (addFile dlfile
                                 (into-array AttachmentOption nil)))
                    (rest files)))))))
+
+;; This section isn't done and I *need* to push an update, and git isn't cooperating. Removing for now, will fix right after.
+;; (defn make-modal 
+;;   "If an event doesn't have enough info, a modal can be made to gather more."
+;;   [event]
+;;   (let [author (.. event getMember)
+;;         bot (.. event getGuild getSelfMember)
+;;         channels (.. event getGuild getTextChannels)
+;;         valid-channels (filter #((set (.. % getMembers)) author) channels)
+;;         selections (for [channel valid-channels]
+;;                      (SelectOption/of (str (.. channel getParentCategory getName) \/ \# (.getName channel)) (.getId channel)))]
+;;     (.. event
+;;         (reply "move where?")
+;;         (addActionRow #{(.. (SelectMenu/create "menu:select-channel")
+;;                             (setRequiredRange 1 1)
+;;                             (addOptions selections)
+;;                             build)})
+;;         complete)))
+                          
+  ;; (.. (Modal/create "modal-test-modal-more-info" "More info is required...")
+  ;;     (addActionRow #{(.. (TextInput/create "channel", "Channel to move to", TextInputStyle/SHORT) build)})
+  ;;     ( addActionRow #{(.. (TextInput/create "mode", "Copy or Cut", TextInputStyle/SHORT) build) })
+  ;;     build))
+  
 
 (defn move
   "Moves a message by placing its content in an embed, and attaching its embeds and files.
@@ -103,14 +131,15 @@
                       (.. sent-msg getJumpUrl)))
         complete)))
 
-(defn move-command [event]
+(defn move-command 
+  [event]
   (let [event-author (.. event getMember)
         message-id (.. event (getOption "message-id") getAsLong)
         message (try (.. event getChannel (retrieveMessageById message-id) complete)
                      (catch Exception e nil)) 
         message-author (when message
                          (.. event getGuild (retrieveMember (.getAuthor message)) complete))
-        target-channel (.. event (getOption "target-channel") getAsGuildChannel)
+        target-channel (.. event (getOption "target-channel") getAsChannel)
         mode (if-let [x (.. event (getOption "mode"))]
                (.getAsString x)
                "copy")
@@ -119,9 +148,9 @@
         can-delete? (or (= "copy" mode)
                         (= message-author event-author)
                         (.. event-author
-                            (hasPermission (.. event getChannel) [Permission/MESSAGE_READ Permission/MESSAGE_MANAGE])))
+                            (hasPermission (.. event getChannel) [Permission/VIEW_CHANNEL Permission/MESSAGE_MANAGE])))
         can-send? (.. event-author
-                      (hasPermission target-channel [Permission/MESSAGE_WRITE]))
+                      (hasPermission target-channel [Permission/MESSAGE_SEND]))
         error-msg (cond
                     (not can-delete?) "You can't delete that message!"
                     (not can-send?) "You can't send messages in that channel!"
@@ -129,7 +158,7 @@
                     (not files-ok?) "One of the attached files is too big for me to send!")]
     (.. event (deferReply true) complete)
     
-    (if error-msg
+    (if error-msg  
       (.. event
           getHook
           (editOriginal error-msg)

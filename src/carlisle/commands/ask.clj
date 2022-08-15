@@ -8,7 +8,7 @@
             [clojure.data.json :as json]
             [clojure.data.xml :as xml])
   (:import  [net.dv8tion.jda.api.interactions.commands OptionType Command]
-            [net.dv8tion.jda.api.interactions.commands.build CommandData OptionData]))
+            [net.dv8tion.jda.api.interactions.commands.build Commands OptionData]))
            
 
 
@@ -30,7 +30,7 @@
     (catch Exception e "Something went wrong, tell Paige")))
 
 (def ask-command-data
-  (.. (CommandData. "ask" "general info")
+  (.. (Commands/slash "ask" "general info")
       (addOptions [(OptionData. OptionType/STRING 
                                 "query" 
                                 "What info do you need?" 

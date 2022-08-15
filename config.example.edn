@@ -11,6 +11,6 @@
  :server-invite-code "qJMZEBzdhm"
  :repo "https://repo.your-bot.com"
  
- ;; any custom emotes you use frequently
- :emotes {:smiley-face 123456789123456789
-          :angry-face 123456789123456789}
+ ;; any custom emoji you use frequently
+ :emoji {:smiley-face 123456789123456789
+         :angry-face 123456789123456789}
