@@ -29,7 +29,7 @@
   [inventory-partition worldstate]
   (let [embed (void-trader-embed-active-template worldstate)
         ducats-emoji (.. app-info getJDA (getEmojiById (-> config :emoji :ducats)))
-        credits-emoji (.. app-info getJDA (getEmojiId (-> config :emoji :credits)))]
+        credits-emoji (.. app-info getJDA (getEmojiById (-> config :emoji :credits)))]
     (doseq [item inventory-partition]
       (.. embed (addField (item :item) 
                           (format "%s%s %s%s" 
