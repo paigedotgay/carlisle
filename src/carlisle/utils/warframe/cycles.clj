@@ -26,6 +26,6 @@
                     (str/capitalize (str (vallis :state) " for the next " (vallis :time-left)))
                     false)
           (addField "Zariman"
-                    (str/capitalize (str "Invaded by " (zariman :state) " for the next " (zariman :time-left)))
+                    (str "Invaded by " (str/capitalize (zariman :state)) " for the next " (zariman :time-left))
                     false)
           (build))}))
