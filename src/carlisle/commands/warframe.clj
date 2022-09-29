@@ -2,6 +2,7 @@
   (:gen-class)
   (:use [carlisle.utils.warframe.worldstate]
         [carlisle.utils.warframe.archon-hunt]
+        [carlisle.utils.warframe.cycles]
         [carlisle.utils.warframe.void-trader])
   (:import [net.dv8tion.jda.api.interactions.commands OptionType]
            [net.dv8tion.jda.api.interactions.commands.build Commands OptionData]))
@@ -10,7 +11,8 @@
   (.. (Commands/slash "warframe" "gets information about Warframe PC Worldstate")
       (addOptions [(.. (OptionData. OptionType/STRING "query" "What do you need information about?" true)
                        (addChoice "Void Trader / Baro Ki'Teer" "void-trader")
-                       (addChoice "Archon Hunt" "archon-hunt"))
+                       (addChoice "Archon Hunt" "archon-hunt")
+                       (addChoice "Time Cycles" "cycles"))
                    
                    (OptionData. OptionType/BOOLEAN 
                                 "show-everyone" 
@@ -26,6 +28,7 @@
                          true))
         embeds (case query
                  "archon-hunt" (build-archon-hunt-embeds event @worldstate)
+                 "cycles"      (build-time-cycle-embeds event @worldstate)
                  "void-trader" (build-void-trader-embeds event @worldstate))]
 
     (.. event 
