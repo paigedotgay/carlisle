@@ -186,9 +186,7 @@
         (replyEmbeds [(build-user-info-embed event (.. event getTargetMember))])
         (setEphemeral true)
         (complete))
-    (let [ephemeral? (if-some [option (.. event (getOption "show-everyone"))]
-                       (not (.. option getAsBoolean))
-                       true)
+    (let [ephemeral? (get-ephemeral-choice event true)
           build-embed (case (.. event getSubcommandName)
                         "bot"   build-bot-info-embed
                         "guild" build-guild-info-embed

@@ -1,4 +1,5 @@
 (ns carlisle.commands.roll
+  (:use [carlisle.utils.commands])
   (:import [net.dv8tion.jda.api.interactions.commands OptionType]
            [net.dv8tion.jda.api.interactions.commands.build Commands]))
 
@@ -63,9 +64,7 @@
         minus (if-let [x (.. event (getOption "minus"))]
                 (.getAsLong x)
                 nil)
-        ephemeral? (if-some [option (.. event (getOption "show-everyone"))]
-                     (not (.. option getAsBoolean))
-                     false)]
+        ephemeral? (get-ephemeral-choice event false)]
     (.. event 
         (reply (roll :dice dice :sides sides :total total :plus plus :minus minus)) 
         (setEphemeral ephemeral?)

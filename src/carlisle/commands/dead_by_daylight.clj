@@ -63,9 +63,7 @@
   (let [perks (case (.. event (getOption  "role") (getAsString))
                 "survivor" sperks
                 "killer" kperks)
-        ephemeral? (if-some [option (.. event (getOption "show-everyone"))]
-                     (not (.. option getAsBoolean))
-                     true)]
+        ephemeral? (get-ephemeral-choice event true)]
     (.. event
         (replyEmbeds (build-perk-roulette-embeds perks))
         (setEphemeral ephemeral?)

@@ -45,9 +45,7 @@
 (defn mtg-command
   [event]
   (let [name (.. event (getOption "name") getAsString)
-        ephemeral? (if-some [option (.. event (getOption "show-everyone"))]
-                     (not (.. option getAsBoolean))
-                     false)]
+        ephemeral? (get-ephemeral-choice event false)]
     (.. event deferReply (setEphemeral ephemeral?) queue)
     (.. event
         getHook

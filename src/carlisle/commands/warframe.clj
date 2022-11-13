@@ -21,11 +21,13 @@
 (defn warframe-command 
   [event]
   (let [query (.. event (getOption "query") getAsString)
-        ephemeral? (if-some [option (.. event (getOption "show-everyone"))]
-                     (not (.. option getAsBoolean))
-                     (case query
-                       "void-trader" (not (-> @worldstate :void-trader :active))
-                         true))
+        ;; Ephemeral default is dynamic here
+        ;; Messages are usually ephemeral, but void-trader will return a non-ephemeral message if the Void Trader is present so that all can see his inventory
+        ephemeral? (get-ephemeral-choice 
+                    event 
+                    (case query
+                      "void-trader" (not (-> @worldstate :void-trader :active))
+                      true))
         embeds (case query
                  "archon-hunt" (build-archon-hunt-embeds event @worldstate)
                  "cycles"      (build-time-cycle-embeds event @worldstate)
