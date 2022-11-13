@@ -1,6 +1,7 @@
 (ns carlisle.commands.warframe
   (:gen-class)
-  (:use [carlisle.utils.warframe.worldstate]
+  (:use [carlisle.utils.commands]
+        [carlisle.utils.warframe.worldstate]
         [carlisle.utils.warframe.archon-hunt]
         [carlisle.utils.warframe.cycles]
         [carlisle.utils.warframe.void-trader])

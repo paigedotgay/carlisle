@@ -2,6 +2,7 @@
   (:gen-class)
   (:use [carlisle.config]
         [carlisle.utils.basic]
+        [carlisle.utils.commands]
         [clojure.java.shell :only [sh]])
   (:require [clojure.string :as str])
   (:import [net.dv8tion.jda.api EmbedBuilder Permission]

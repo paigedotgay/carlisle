@@ -1,6 +1,7 @@
 (ns carlisle.commands.dead-by-daylight
   (:gen-class)
-  (:use [carlisle.utils.basic :only [make-basic-embed]])
+  (:use [carlisle.utils.basic :only [make-basic-embed]]
+        [carlisle.utils.commands])
   (:require [camel-snake-kebab.core :as csk]
             [clojure.data.json :as json])
   (:import [net.dv8tion.jda.api EmbedBuilder]

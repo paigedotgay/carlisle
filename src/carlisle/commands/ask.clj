@@ -2,6 +2,7 @@
   (:gen-class)
   (:use [carlisle.config :only [config]] 
         [carlisle.utils.basic]
+        [carlisle.utils.commands]
         [clojure.java.javadoc]
         [clojure.repl])
   (:require [clojure.string :as str]
