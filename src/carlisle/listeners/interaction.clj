@@ -3,7 +3,6 @@
   (:use [carlisle.config :only [config]] 
         [carlisle.logging :only [log-message]]
         [carlisle.commands.ask]
-        [carlisle.commands.dead-by-daylight]
         [carlisle.commands.info]
         [carlisle.commands.move]
         [carlisle.commands.mtg]
@@ -30,7 +29,6 @@
               (try
                 (case (.getName event)
                   "ask"              (ask-command event)
-                  "dead-by-daylight" (dead-by-daylight-command event)
                   "info"             (info-command event)
                   "move"             (move-command event)
                   "mtg"              (mtg-command event)
