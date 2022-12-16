@@ -11,7 +11,8 @@
             [clojure.data.xml :as xml])
   (:import [java.io ByteArrayOutputStream PrintStream PrintWriter OutputStreamWriter]
            [net.dv8tion.jda.api.events.message MessageReceivedEvent]
-           [net.dv8tion.jda.api.entities ChannelType Message$MentionType]
+           [net.dv8tion.jda.api.entities Message$MentionType] 
+           [net.dv8tion.jda.api.entities.channel ChannelType]
            [net.dv8tion.jda.api.utils MarkdownSanitizer]))
 
 ;; Mostly here for repl sessions and debugging
@@ -81,7 +82,7 @@
   "Ensures that an eval is intended, and it is sent by owner"
   [event]
   (let [msg (.. event getMessage)
-        ids #{(if (.. event (isFromType ChannelType/TEXT)) 
+        ids #{(when (.. event (isFromType ChannelType/TEXT)) 
                 (.. event getGuild getBotRole getId))
               (.. event getJDA getSelfUser getId)}]
     
@@ -108,9 +109,8 @@
                     (first)))
 
      ;; make sure message is sent by owner
-     (=
-      (.. event getAuthor)
-      (.. app-info getOwner)))))
+     (= (.. event getAuthor)
+        (.. app-info getOwner)))))
 
 (defn- eval-to-map [txt]
   (with-out-result-map 

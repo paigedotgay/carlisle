@@ -1,6 +1,6 @@
 (ns carlisle.logging
   (:gen-class)
-  (:import [net.dv8tion.jda.api.entities ChannelType]
+  (:import [net.dv8tion.jda.api.entities.channel ChannelType]
            [net.dv8tion.jda.api.events.message MessageReceivedEvent])
   (:require [clojure.tools.logging :as log]))
 

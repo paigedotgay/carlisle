@@ -4,10 +4,9 @@
            [net.dv8tion.jda.api.interactions InteractionType]
            [net.dv8tion.jda.api.interactions.commands OptionType]
            [net.dv8tion.jda.api.interactions.commands.build Commands OptionData]
-           [net.dv8tion.jda.api.interactions.components Modal]
+           [net.dv8tion.jda.api.interactions.modals Modal]
            [net.dv8tion.jda.api.interactions.components.selections SelectMenu SelectOption]
-           [net.dv8tion.jda.api.interactions.components.text TextInput TextInputStyle]
-           [net.dv8tion.jda.api.utils AttachmentOption]))
+           [net.dv8tion.jda.api.interactions.components.text TextInput TextInputStyle]))
 
 (def move-command-data
   (.. (Commands/slash "move" "Move a message from one channel to another")
@@ -40,10 +39,9 @@
           (let [file (first files)
                 path (str tmp-dir (.getFileName file))
                 dlfile (.. file (downloadToFile path) get)
-                spoiler (and (.isSpoiler file) AttachmentOption/SPOILER)]
+                spoiler (and (.isSpoiler file))]
             (recur (.. message 
-                       (addFile dlfile
-                                (into-array AttachmentOption nil)))
+                       (addFiles [dlfile]))
                    (rest files)))))))
 
 ;; This section isn't done and I *need* to push an update, and git isn't cooperating. Removing for now, will fix right after.

@@ -3,7 +3,7 @@
   (:use [carlisle.utils.basic])
   (:require [clojure.string :as str])
   (:import [net.dv8tion.jda.api EmbedBuilder Permission]
-           [net.dv8tion.jda.api.entities ChannelType]
+           [net.dv8tion.jda.api.entities.channel ChannelType]
            [net.dv8tion.jda.api.hooks ListenerAdapter]
            [net.dv8tion.jda.api.interactions.commands OptionType Command DefaultMemberPermissions]
            [net.dv8tion.jda.api.interactions.commands.build Commands OptionData SubcommandData]

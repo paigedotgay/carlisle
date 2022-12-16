@@ -4,7 +4,8 @@
         [carlisle.config :only [config]] 
         [carlisle.listeners.message]
         [carlisle.listeners.ready]
-        [carlisle.listeners.interaction])
+        [carlisle.listeners.interaction]
+        [carlisle.listeners.thirty-one])
   (:import [net.dv8tion.jda.api JDABuilder Permission]
            [net.dv8tion.jda.api.requests GatewayIntent]
            [net.dv8tion.jda.api.utils.cache CacheFlag]
@@ -34,6 +35,7 @@
            (addEventListeners (object-array [message-listener 
                                              ready-listener
                                              role-signup-button-listener
+                                             thirty-one-listener
                                              command-listener]))
            (build))))
 

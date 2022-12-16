@@ -9,6 +9,7 @@
         [carlisle.commands.repl]
         [carlisle.commands.role-signup]
         [carlisle.commands.roll]
+        [carlisle.commands.thirty-one]
         [carlisle.commands.warframe]
         [carlisle.utils])
   (:import [net.dv8tion.jda.api.events.message MessageReceivedEvent]
@@ -34,6 +35,7 @@
                   "mtg"              (mtg-command event)
                   "role-signup"      (role-signup-command event)
                   "roll"             (roll-command event)
+                  "thirty-one"       (thirty-one-command event)
                   "warframe"         (warframe-command event))
             
                 (catch Exception e  
