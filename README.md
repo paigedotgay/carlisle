@@ -2,7 +2,7 @@
 
 [![support-server]](https://server.carlisle-bot.com)
 [![open-issues]](https://repo.carlisle-bot.com/issues)
-[![closed-issues]](https://gitlab.com/qanazoga/carlisle/-/issues?scope=all&state=closed)
+[![closed-issues]](https://gitlab.com/paigedotgay/carlisle/-/issues?scope=all&state=closed)
 [![last-update]](https://repo.carlisle-bot.com/commits)
 
 This is something I've been trying to get working for a while, and am finally willing to take another stab at.
